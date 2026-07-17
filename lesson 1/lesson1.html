@@ -1,1 +1,1369 @@
-qq
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python · Урок 2 — Змінні та типи даних</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F5;
+    --panel:#FFFFFF;
+    --ink:#17151A;
+    --ink-soft:#5B584F;
+    --ink-faint:#918D82;
+    --red:#C81E1E;
+    --red-deep:#8C1410;
+    --red-wash:#FBEAE9;
+    --rule:#E6E2D8;
+    --code-bg:#F4F2EC;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'IBM Plex Sans', -apple-system, sans-serif;
+    --display:'Manrope', var(--sans);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); line-height:1.6; font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--red); color:#fff;}
+  a{color:var(--red-deep);}
+
+  /* ---------- Header ---------- */
+  header.hero{
+    padding:56px 24px 32px; max-width:880px; margin:0 auto; text-align:left;
+    border-bottom:1px solid var(--rule);
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--red); font-weight:700; display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{content:"›_"; color:var(--red);}
+  h1.title{
+    font-family:var(--display); font-weight:800; font-size:clamp(1.8rem,4vw,2.6rem);
+    margin:10px 0 6px; letter-spacing:-0.01em;
+  }
+  .subtitle{color:var(--ink-soft); font-size:1.02rem; max-width:60ch;}
+  .pyostatus{
+    margin-top:18px; display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:.8rem; color:var(--ink-soft);
+    border:1px solid var(--rule); background:var(--panel); padding:6px 12px; border-radius:999px;
+  }
+  .pyostatus .dot{width:8px; height:8px; border-radius:50%; background:var(--ink-faint); transition:background .3s;}
+  .pyostatus.ready .dot{background:#2E8B57;}
+  .pyostatus.loading .dot{background:var(--red); animation:blink 1s infinite;}
+  @keyframes blink{50%{opacity:.25;}}
+
+  /* ---------- Day nav ---------- */
+  nav.daynav{
+    position:sticky; top:0; z-index:20; background:rgba(250,249,245,.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--rule); padding:10px 24px;
+  }
+  nav.daynav .wrap{max-width:880px; margin:0 auto; display:flex; gap:10px; flex-wrap:wrap;}
+  nav.daynav a{
+    font-family:var(--mono); font-size:.82rem; text-decoration:none; color:var(--ink-soft);
+    border:1px solid var(--rule); padding:6px 14px; border-radius:999px; background:var(--panel);
+    transition:.15s;
+  }
+  nav.daynav a:hover{border-color:var(--red); color:var(--red-deep);}
+
+  main{max-width:880px; margin:0 auto; padding:8px 24px 100px;}
+
+  .day-marker{
+    margin:52px 0 22px; display:flex; align-items:baseline; gap:14px;
+  }
+  .day-marker .num{
+    font-family:var(--mono); font-size:2.2rem; font-weight:700; color:var(--red); line-height:1;
+  }
+  .day-marker .meta{font-family:var(--mono); font-size:.85rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.08em;}
+  .day-marker h2{font-family:var(--display); font-weight:800; font-size:1.5rem; margin:2px 0 0;}
+
+  /* ---------- Phase (collapsible) ---------- */
+  .phase{
+    background:var(--panel); border:1px solid var(--rule); border-radius:14px;
+    margin:18px 0; overflow:hidden;
+  }
+  .phase-header{
+    display:flex; align-items:center; gap:14px; padding:16px 20px; cursor:pointer; user-select:none;
+  }
+  .phase-header .phase-num{
+    font-family:var(--mono); color:var(--red); font-weight:700; font-size:.85rem; flex:0 0 auto;
+  }
+  .phase-header h3{
+    font-family:var(--display); font-weight:700; font-size:1.08rem; margin:0; flex:1;
+  }
+  .phase-header .chev{
+    font-family:var(--mono); color:var(--ink-faint); transition:transform .25s; font-size:.9rem;
+  }
+  .phase.open .phase-header .chev{transform:rotate(90deg); color:var(--red);}
+  .phase-body{
+    max-height:0; overflow:hidden; transition:max-height .35s ease;
+    padding:0 22px;
+  }
+  .phase.open .phase-body{padding:0 22px 22px;}
+  .phase-body > *:first-child{margin-top:0;}
+
+  h4.sub{font-family:var(--display); font-weight:700; font-size:1rem; margin:22px 0 8px; color:var(--ink);}
+  p{margin:10px 0;}
+  ul, ol{padding-left:1.3em;}
+  li{margin:5px 0;}
+  code.inline, .inline-code{
+    font-family:var(--mono); background:var(--code-bg); padding:1px 6px; border-radius:5px; font-size:.9em;
+  }
+  strong{color:var(--ink);}
+
+  /* ---------- Image frame placeholder ---------- */
+  .img-frame{
+    border:2px dashed var(--rule); border-radius:12px; padding:38px 20px;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    color:var(--ink-faint); background:repeating-linear-gradient(135deg, transparent, transparent 10px, #F1EFE8 10px, #F1EFE8 11px);
+    margin:16px 0; text-align:center;
+  }
+  .img-frame svg{width:34px; height:34px; opacity:.5;}
+  .img-frame .cap{font-family:var(--mono); font-size:.78rem; color:var(--ink-faint);}
+
+  /* ---------- Code block / sandbox ---------- */
+  .code-block{margin:16px 0; border:1px solid var(--rule); border-radius:12px; overflow:hidden; background:var(--panel);}
+  .cb-tabs{display:flex; background:var(--code-bg); border-bottom:1px solid var(--rule); overflow-x:auto;}
+  .cb-tab{
+    font-family:var(--mono); font-size:.8rem; padding:9px 16px; cursor:pointer; white-space:nowrap;
+    color:var(--ink-soft); border-right:1px solid var(--rule); background:transparent; border-top:2px solid transparent;
+  }
+  .cb-tab.active{background:var(--panel); color:var(--ink); border-top:2px solid var(--red); font-weight:600;}
+  .cb-label{
+    font-family:var(--mono); font-size:.75rem; color:var(--ink-faint); padding:9px 14px; border-right:1px solid var(--rule);
+  }
+  .cb-editor{
+    width:100%; border:none; resize:vertical; background:var(--code-bg); color:var(--ink);
+    font-family:var(--mono); font-size:.87rem; line-height:1.55; padding:16px 18px; min-height:60px;
+    display:block; tab-size:4;
+  }
+  .cb-editor:focus{outline:none; background:#F8F6F0;}
+  .cb-toolbar{
+    display:flex; align-items:center; gap:12px; padding:10px 16px; border-top:1px solid var(--rule);
+  }
+  .cb-run{
+    font-family:var(--mono); font-size:.82rem; font-weight:700; color:#fff; background:var(--red);
+    border:none; border-radius:8px; padding:8px 18px; cursor:pointer; display:flex; align-items:center; gap:7px;
+    transition:.15s;
+  }
+  .cb-run:hover{background:var(--red-deep);}
+  .cb-run:disabled{background:var(--ink-faint); cursor:wait;}
+  .cb-hint{font-family:var(--mono); font-size:.74rem; color:var(--ink-faint);}
+  .cb-output{
+    display:none; border-top:1px dashed var(--rule); padding:14px 18px; background:#FFFFFF;
+    font-family:var(--mono); font-size:.85rem; white-space:pre-wrap; word-break:break-word;
+  }
+  .cb-output.visible{display:block;}
+  .cb-output .tag{color:var(--red); font-weight:700; margin-right:4px;}
+
+  /* ---------- Table ---------- */
+  table.reftable{width:100%; border-collapse:collapse; margin:16px 0; font-size:.92rem;}
+  table.reftable th{
+    background:var(--red); color:#fff; text-align:left; padding:9px 12px; font-family:var(--display); font-weight:700; font-size:.85rem;
+  }
+  table.reftable td{padding:8px 12px; border-bottom:1px solid var(--rule);}
+  table.reftable td:first-child{font-family:var(--mono); white-space:nowrap; color:var(--red-deep);}
+  table.reftable tr:nth-child(even){background:var(--code-bg);}
+
+  /* ---------- Task card ---------- */
+  .task-card{
+    border-left:4px solid var(--red); background:var(--panel); border-radius:0 12px 12px 0;
+    padding:16px 20px; margin:16px 0; border-top:1px solid var(--rule); border-right:1px solid var(--rule); border-bottom:1px solid var(--rule);
+  }
+  .task-card .task-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .task-badge{
+    font-family:var(--mono); font-weight:700; font-size:.78rem; color:#fff; background:var(--red);
+    width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+  }
+  .task-title{font-family:var(--display); font-weight:700; font-size:1rem;}
+  .task-body{color:var(--ink); font-size:.96rem;}
+  .task-body em.hint{color:var(--ink-soft); font-style:italic; font-size:.9rem;}
+
+  /* ---------- Reveal ---------- */
+  .reveal-btn{
+    margin-top:12px; font-family:var(--mono); font-size:.8rem; color:var(--red-deep); background:var(--red-wash);
+    border:1px solid #EFC9C7; border-radius:8px; padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+  }
+  .reveal-btn:hover{background:#F6DAD8;}
+  .reveal-btn .chev{transition:transform .2s;}
+  .reveal-btn.open .chev{transform:rotate(90deg);}
+  .reveal-content{display:none; margin-top:10px;}
+  .reveal-content.open{display:block;}
+
+  /* ---------- Quiz true/false ---------- */
+  .quiz-item{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:10px 14px; border:1px solid var(--rule); border-radius:9px; margin:8px 0; background:var(--panel);
+  }
+  .quiz-item .stmt{font-family:var(--mono); font-size:.88rem;}
+  .quiz-btn{
+    font-family:var(--mono); font-size:.76rem; border:1px solid var(--rule); background:var(--code-bg);
+    padding:5px 12px; border-radius:6px; cursor:pointer; color:var(--ink-soft); min-width:76px; text-align:center;
+  }
+  .quiz-btn.shown{background:var(--red); border-color:var(--red); color:#fff;}
+
+  /* ---------- Discussion list ---------- */
+  .discuss-box{border:1px solid var(--rule); border-radius:12px; padding:16px 20px; background:var(--code-bg);}
+  .discuss-box li{margin:8px 0;}
+
+  footer{
+    max-width:880px; margin:60px auto 40px; padding:0 24px; color:var(--ink-faint); font-size:.85rem;
+    font-family:var(--mono); border-top:1px solid var(--rule); padding-top:20px;
+  }
+
+  @media (max-width:600px){
+    header.hero{padding:40px 16px 24px;} main{padding:8px 16px 80px;}
+    .cb-editor{font-size:.8rem;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">python · урок 2</div>
+  <h1 class="title">Змінні та типи даних</h1>
+  <p class="subtitle">Ідентифікатори, числові типи, print() та input(), арифметика, логічні оператори, порівняння — день 1. Рядки, індексація, методи рядків, Unicode — день 2.</p>
+  <div class="pyostatus" id="pyoStatus"><span class="dot"></span><span id="pyoStatusText">Python-середовище: очікує запуску</span></div>
+</header>
+
+<main>
+
+<!-- ================= DAY 1 ================= -->
+<div class="day-marker" id="day1">
+  <div class="num">01</div>
+  <div><h2>Ідентифікатори, типи даних, числа</h2></div>
+</div>
+
+<!-- PHASE 1 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">01</span>
+    <h3>Visual Studio Code для Python</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <ol>
+      <li><strong>Встанови Python</strong> (python.org). Постав галочку <span class="inline-code">Add to PATH</span>.</li>
+      <li><strong>Встанови VS Code</strong> (Win/Mac/Linux).</li>
+      <li><strong>Відкрий проєкт</strong> у VS Code (File → Open Folder...), створи <span class="inline-code">main.py</span>.</li>
+      <li><strong>Extensions → Python</strong> (Microsoft) → Install.</li>
+      <li><strong>Ctrl+Shift+P</strong> → Python: Select Interpreter → Python 3.x (64-bit).</li>
+      <li><strong>Запуск:</strong> кнопка ▶ або термінал: <span class="inline-code">python main.py</span> (Windows: <span class="inline-code">py main.py</span>).</li>
+    </ol>
+  </div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">02</span>
+    <h3>Ідентифікатори</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p><strong>Ідентифікатор</strong> — це ім'я, за яким можна звертатися до будь-якого об'єкта. Він може складатися з великих і маленьких букв, цифр, знаків підкреслення.</p>
+    <p>⚠️ Не повинен починатися з цифри і не може збігатися із зарезервованими ключовими словами: <span class="inline-code">False, class, finally, is, return, None, continue, for, lambda, try, True, def, from, nonlocal, while, and, del, global, not, with, as, elif, if, or, yield, assert, else, import, pass, break, except, in, raise</span>.</p>
+    <img src="pic1.png">
+    <!-- Валеріє: сюди вставити <img src="..."> замість блоку .img-frame -->
+    <p><strong>None</strong> — спеціальне значення типу NoneType, яке використовується, щоб вказати на відсутність значення.</p>
+  </div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">03</span>
+    <h3>Типи даних</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <ul>
+      <li><strong>int</strong> — тип даних, який використовується для цілих чисел. Приклади: 3; 0; 25612346252</li>
+      <li><strong>bool</strong> — логічні значення. Використовується для перевірки істинності якоїсь умови. Якщо умова вірна — <span class="inline-code">True</span>, інакше — <span class="inline-code">False</span>.</li>
+      <li><strong>float</strong> — дійсні числа подвійної точності. Приклади: 0.3215235, 125256.73</li>
+      <li><strong>complex</strong> — комплексні числа. Приклади: 2+3j, 0.7 - 0.1j</li>
+      <li><strong>str</strong> — незмінна послідовність символів; "string" — "рядок".</li>
+    </ul>
+    <h4 class="sub">print()</h4>
+    <p>Виводить текст у консоль. Кожен <span class="inline-code">print</span> закінчується новим рядком.</p>
+    <h4 class="sub">Як працює print(): коми та лапки</h4>
+    <ul>
+      <li><strong>Лапки</strong> "…" або '…' — це <em>рядок</em> (текст-букви). Те, що в лапках, друкується як є: <span class="inline-code">print("Привіт")</span>.</li>
+      <li><strong>Без лапок</strong> — це <em>змінні або вирази</em>, які спершу обчислюються: <span class="inline-code">a = 5, print(a)</span> → покаже 5, а не букву «a».</li>
+      <li><strong>Кома в print</strong> розділяє частини і автоматично ставить пробіл між ними: <span class="inline-code">print("Сума:", 2+3)</span> → Сума: 5.</li>
+      <li><strong>Плюс +</strong> з'єднує саме рядки: <span class="inline-code">"Привіт, " + name</span>. Якщо зліва текст, а справа число — треба перетворити: <span class="inline-code">str(число)</span>.</li>
+      <li><strong>F-рядки</strong> (зручно!): <span class="inline-code">name="Іра"; print(f"Привіт, {name}")</span> — вставляє значення прямо в текст.</li>
+    </ul>
+    <div class="code-block" id="cb-types"></div>
+  </div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">04</span>
+    <h3>Введення та перетворення типів</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Для введення даних із клавіатури використовується функція <span class="inline-code">input()</span>. Результат цієї функції завжди є рядком (str).</p>
+    <div class="code-block" id="cb-dynamic"></div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">✎</span><span class="task-title">Завдання</span></div>
+      <div class="task-body">Запитати в користувача одне ціле і одне десяткове число за допомогою <span class="inline-code">input()</span> та обчислити їхню суму.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 5 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">05</span>
+    <h3>Операції з числами</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <table class="reftable">
+      <tr><th>Вираз</th><th>Значення</th></tr>
+      <tr><td>x + y</td><td>сума</td></tr>
+      <tr><td>x − y</td><td>різниця</td></tr>
+      <tr><td>x * y</td><td>добуток</td></tr>
+      <tr><td>x / y</td><td>частка</td></tr>
+      <tr><td>x // y</td><td>цілочисельне ділення</td></tr>
+      <tr><td>x % y</td><td>остача від ділення</td></tr>
+      <tr><td>-x</td><td>число, протилежне до x</td></tr>
+      <tr><td>+x</td><td>x</td></tr>
+      <tr><td>abs(x)</td><td>модуль числа x</td></tr>
+      <tr><td>int(x)</td><td>перетворити x на ціле число</td></tr>
+      <tr><td>float(x)</td><td>перетворити x на дійсне число</td></tr>
+      <tr><td>x ** y, pow(x, y)</td><td>x у степені y</td></tr>
+      <tr><td>round(x), round(x, n)</td><td>округлити x (до n знаків, якщо вказано)</td></tr>
+    </table>
+    <p>Скорочені форми присвоєння:</p>
+    <ul>
+      <li><span class="inline-code">my_variable = my_variable + 4</span> ⇔ <span class="inline-code">my_variable += 4</span></li>
+      <li><span class="inline-code">my_variable = my_variable - 4</span> ⇔ <span class="inline-code">my_variable -= 4</span></li>
+      <li><span class="inline-code">my_variable = my_variable * 4</span> ⇔ <span class="inline-code">my_variable *= 4</span></li>
+      <li><span class="inline-code">my_variable = my_variable / 4</span> ⇔ <span class="inline-code">my_variable /= 4</span></li>
+    </ul>
+    <div class="code-block" id="cb-arithmetic"></div>
+    <div class="code-block" id="cb-operators-table"></div>
+  </div>
+</section>
+
+<!-- PHASE 6 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">06</span>
+    <h3>Логічні оператори</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Логічні оператори — це спеціальні слова, які дозволяють комбінувати кілька умов в одну. Вони повертають лише два значення: <span class="inline-code">True</span> (істина) або <span class="inline-code">False</span> (хибність).</p>
+    <div class="code-block" id="cb-logical-table"></div>
+
+    <h4 class="sub">Оператор AND</h4>
+    <img src="and.png">
+    <p>Результат <span class="inline-code">True</span> тільки коли <strong>обидві</strong> умови істинні.</p>
+    <div class="code-block" id="cb-and"></div>
+
+    <h4 class="sub">Оператор OR</h4>
+    <img src="or.png">
+    <p>Результат <span class="inline-code">True</span>, коли <strong>хоча б одна</strong> умова істинна.</p>
+    <div class="code-block" id="cb-or"></div>
+
+    <h4 class="sub">Оператор NOT</h4>
+   <img src="not.png">
+    <p>Перевертає значення: <span class="inline-code">True → False</span>, <span class="inline-code">False → True</span></p>
+    <div class="code-block" id="cb-not"></div>
+
+    <h4 class="sub">Комбінування операторів</h4>
+    <p><strong>Приклад 1: Доступ до атракціону</strong></p>
+    <div class="code-block" id="cb-combine1"></div>
+    <p><strong>Приклад 2: Знижка в магазині</strong></p>
+    <div class="code-block" id="cb-combine2"></div>
+    <p><strong>Приклад 3: Валідація пароля</strong></p>
+    <div class="code-block" id="cb-combine3"></div>
+
+    <h4 class="sub">🎯 Перевір себе!</h4>
+    <div id="quiz-logic"></div>
+  </div>
+</section>
+
+<!-- PHASE 7 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">07</span>
+    <h3>Операції порівняння</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <table class="reftable">
+      <tr><th>Вираз</th><th>Значення</th></tr>
+      <tr><td>x &lt; y</td><td>x строго менше y</td></tr>
+      <tr><td>x &gt; y</td><td>x строго більше y</td></tr>
+      <tr><td>x <= y</td><td>x менше або дорівнює y</td></tr>
+      <tr><td>x >= y</td><td>x більше або дорівнює y</td></tr>
+      <tr><td>x == y</td><td>x дорівнює y</td></tr>
+      <tr><td>x != y</td><td>x не дорівнює y</td></tr>
+      <tr><td>x is y</td><td>x та y — один і той самий об'єкт</td></tr>
+      <tr><td>x is not y</td><td>x та y не є одним і тим самим об'єктом у пам'яті</td></tr>
+    </table>
+    <p>З операціями &lt;, &gt;, &lt;=, &gt;= можна використовувати подвійні порівняння, наприклад <span class="inline-code">-2 <= x &lt; 3</span>.</p>
+    <div class="code-block" id="cb-comparisons"></div>
+  </div>
+</section>
+
+<!-- PHASE 8 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">08</span>
+    <h3>Закріплення матеріалу</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="discuss-box">
+      <ul>
+        <li>Які є типи даних? Які з них числові?</li>
+        <li>Як можна розписати <span class="inline-code">a *= b</span>?</li>
+        <li>Яким буде результат виразу <span class="inline-code">3 != 4 and not ("test" != "test" or "Python" == "Python")</span>?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 9 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">09</span>
+    <h3>Додаткове завдання (домашнє)</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">1</span><span class="task-title">Площа кола</span></div>
+      <div class="task-body">Напишіть програму, яка запитує у користувача радіус кола і виводить його площу. Формула площі кола: S = πr².</div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">2</span><span class="task-title">Час у дорозі</span></div>
+      <div class="task-body">
+        Напишіть програму, використовуючи знання про змінні типу цілих чисел, щоб підрахувати, за який час транспортний засіб доїде з пункту А в пункт В, якщо відстань від А до В = 700 км, а швидкість автомобіля постійна і дорівнює 90 км/год.<br>
+        Використайте формулу: Час = відстань / швидкість. Створіть змінні <span class="inline-code">length</span> (відстань), <span class="inline-code">velocity</span> (швидкість) та <span class="inline-code">time</span> (результат). Виведіть результат через <span class="inline-code">print()</span>.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DAY 2 ================= -->
+<div class="day-marker" id="day2">
+  <div class="num">02</div>
+  <div><h2>Рядки, індексація, методи рядків</h2></div>
+</div>
+
+<!-- PHASE 10 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">10</span>
+    <h3>Рядки (string, str)</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p><strong>Рядок (string, str)</strong> у Python — це <strong>послідовність символів</strong>, взята в лапки: "Hello", 'ITway', "2025". Символами можуть бути:</p>
+    <ul>
+      <li>букви (латиниця, кирилиця тощо);</li>
+      <li>цифри;</li>
+      <li>пробіли, розділові знаки;</li>
+      <li>емодзі 💻🔥🙂.</li>
+    </ul>
+    <div class="code-block" id="cb-str-intro"></div>
+  </div>
+</section>
+
+<!-- PHASE 11 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">11</span>
+    <h3>Регістр і довжина рядка</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <ul>
+      <li>усі великі літери — <span class="inline-code">upper()</span></li>
+      <li>усі малі — <span class="inline-code">lower()</span></li>
+      <li>кожне слово з великої — <span class="inline-code">title()</span></li>
+      <li>довжина рядка — <span class="inline-code">len()</span></li>
+    </ul>
+    <div class="code-block" id="cb-case-length"></div>
+    <h4 class="sub">Чому важливо приводити до одного регістру?</h4>
+    <p>Коли користувач вводить текст, він може писати як завгодно: "Yes", "YES", "yes", "yEs"… Для нас усі ці варіанти означають одне і те саме, але для комп'ютера це різне. Тому регістр завжди потрібно нормалізувати.</p>
+    <div class="img-frame" data-caption="image5">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="15" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5-5L5 19"/></svg>
+      <div class="cap">[скріншот: нормалізація регістру — image5.png]</div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 12 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">12</span>
+    <h3>Індексація</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="img-frame" data-caption="image6">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="15" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5-5L5 19"/></svg>
+      <div class="cap">[скріншот: індексація "Hello world!" — image6.png]</div>
+    </div>
+    <p>Кожен символ рядка має свій номер (індекс), починаючи з 0 зліва або з -1 з кінця. Наприклад для <span class="inline-code">"Hello world!"</span>: <span class="inline-code">H</span> має індекс 0, <span class="inline-code">!</span> має індекс -1.</p>
+    <div class="code-block" id="cb-indexing"></div>
+  </div>
+</section>
+
+<!-- PHASE 13 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">13</span>
+    <h3>Текст × число</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="code-block" id="cb-repeat"></div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">✎</span><span class="task-title">Завдання</span></div>
+      <div class="task-body">Запитати в користувача якусь фразу, запитати число (n) і вивести введену фразу n кількість разів.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 14 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">14</span>
+    <h3>Конкатенація рядків (+)</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Ми можемо «склеювати» рядки знаком <span class="inline-code">+</span> — це називається конкатенацією.</p>
+    <div class="code-block" id="cb-concat"></div>
+    <h4 class="sub">Усі функції рядків разом</h4>
+    <div class="code-block" id="cb-all-methods"></div>
+  </div>
+</section>
+
+<!-- PHASE 15 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">15</span>
+    <h3>Exercise 1 — String Transformation</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">✎</span><span class="task-title">Task</span></div>
+      <div class="task-body">
+        You are given:<br>
+        <span class="inline-code">string = " lorem Ipsum dolor Sit amet, consectetur adipisicing elit. "</span>
+        <ol>
+          <li>Remove spaces at the beginning and end of the string.</li>
+          <li>Replace "lorem" with "LOREM".</li>
+          <li>Print the string: in upper case / in lower case / with title() / with capitalize().</li>
+          <li>Print: how many times the letter 'i' appears (case insensitive!) / whether the string starts with "LOREM" / whether the string ends with ".".</li>
+          <li>Print the string centered with width 80 using '*'.</li>
+        </ol>
+      </div>
+    </div>
+    <h4 class="sub">Розбір разом</h4>
+    <div class="code-block" id="cb-exercise1"></div>
+  </div>
+</section>
+
+<!-- PHASE 16 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">16</span>
+    <h3>Unicode</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Раніше комп'ютери розуміли тільки числа. Тому кожній букві призначали число. Наприклад, у старому стандарті <strong>ASCII</strong>: A = 65, B = 66, a = 97.</p>
+    <p>Але ASCII мав лише 128 символів: англійські літери, цифри, базові символи. Не було українських літер, японських символів, емодзі і т.д.</p>
+    <p><strong>Unicode</strong> — це універсальний стандарт, який призначає унікальний номер кожному символу у світі:</p>
+    <ul>
+      <li>A → U+0041</li>
+      <li>Б → U+0411</li>
+      <li>あ → U+3042</li>
+      <li>😀 → U+1F600</li>
+    </ul>
+    <p>"U+" означає номер символу в таблиці Unicode. Завдяки Unicode текст виглядає однаково на різних пристроях — українська, китайська, арабська — усе працює.</p>
+    <h4 class="sub">Як це працює в Python</h4>
+    <p>У Python 3 всі рядки (str) — це Unicode. Можна навіть отримати код символу або вивести символ за кодом:</p>
+    <div class="code-block" id="cb-unicode"></div>
+    <h4 class="sub">Чому це важливо в реальному житті</h4>
+    <p>Без Unicode: ламався б текст, замість букв були б "кракозябри", різні системи не розуміли б одна одну.</p>
+  </div>
+</section>
+
+<!-- PHASE 17 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">17</span>
+    <h3>Самостійна діяльність учня (домашнє завдання)</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">1</span><span class="task-title">Два слова через кому</span></div>
+      <div class="task-body">Напишіть програму, яка запитує у користувача два слова і виводить їх розділеними комою.</div>
+      <button class="reveal-btn" data-reveal="rv1"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv1"><div class="code-block" id="cb-hw1"></div></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">2</span><span class="task-title">Добуток трьох чисел</span></div>
+      <div class="task-body">Напишіть програму, яка запитує три цілі числа a, b і x та друкує їх добуток.</div>
+      <button class="reveal-btn" data-reveal="rv2"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv2"><div class="code-block" id="cb-hw2"></div></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">3</span><span class="task-title">Квадратне рівняння</span></div>
+      <div class="task-body">Напишіть програму, яка розв'язує квадратне рівняння ax² + bx + c = 0 за формулою x₁,₂ = (−b ± √(b² − 4ac)) / 2a. Значення a, b та c вводяться з клавіатури. Для знаходження кореня використовуйте оператор зведення в степінь, щоб отримати комплексні числа у випадку, якщо вираз під коренем від'ємний.</div>
+      <button class="reveal-btn" data-reveal="rv3"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv3"><div class="code-block" id="cb-hw3"></div></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">4</span><span class="task-title">Обернений текст</span></div>
+      <div class="task-body">Напишіть програму, яка вводить з клавіатури текст і виводить його в оберненому порядку.</div>
+      <button class="reveal-btn" data-reveal="rv4"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv4"><div class="code-block" id="cb-hw4"></div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>Python · Урок 2 — Змінні та типи даних · сендбокси виконуються через Pyodide прямо в браузері</footer>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v314.0.2/full/pyodide.js"></script>
+<script>
+/* =====================================================================
+   ДАНІ КОДОВИХ БЛОКІВ
+   Кожен запис у CODE_BLOCKS — масив "файлів" (вкладок).
+   ===================================================================== */
+const CODE_BLOCKS = {
+  "cb-types": [
+    { name: "1_int.py", input: false, code:
+`# Числа у десятковій системі числення
+decimal_1 = 8
+decimal_2 = 42
+decimal_3 = -3
+decimal_4 = 258028365723567230582038
+
+print(decimal_1)
+print(decimal_2)
+print(decimal_3)
+print(decimal_4)
+# пусто print для перенесення рядка
+print()
+
+# Побудова цілого числа з іншого значення
+string = "15"
+number = string
+print(number)
+print(string)
+print(number + str(5))
+# string + 5 -- помилка TypeError: can only concatenate str (not "int") to str
+print(int(number) + 5)
+print(number * 5)
+print(int(number) * 5)` },
+    { name: "2_bool.py", input: false, code:
+`# Істинне значення
+boolean_1 = True
+
+# Хибне значение
+boolean_2 = False
+
+print(boolean_1)
+print(boolean_2)` },
+    { name: "3_float.py", input: false, code:
+`# Приклади дійсних чисел
+a = 0.5
+b = 3.2
+
+# Побудова дійсного значення
+
+# з рядку
+print(float("0.5"))
+# з цілочисельного значення
+print(float(3))` }
+  ],
+
+  "cb-dynamic": [
+    { name: "5_dynamic_typing.py", input: false, code:
+`# Змінні – імена, які прив'язуються до об'єктів
+var = 'I am a string'
+print(var)
+# type(var) повертає тип об'єкта, на який посилається var
+print(type(var))
+
+print()
+
+# Їх можна прив'язувати до нових значень
+var = 32
+print(var)
+print(type(var))
+
+print()
+
+# Однак потрібно розуміти, який тип на даний момент може
+# мати об'єкт і змішувати несумісні типи не можна
+a = 6
+b = 5
+# два числа скласти можна
+print(a + b)
+
+b = '5'
+# print(a + b)  # число з рядком - ні (отримуємо помилку)` }
+  ],
+
+  "cb-arithmetic": [
+    { name: "6_arithmetic_operations.py", input: false, code:
+`x = 2
+y = 8
+
+# додавання
+print(x + y)
+print(x + 3)
+# віднімання
+print(x - y)
+# множення
+print(x * y)
+# ділення
+print()
+print(x / y)
+# цілочисельне ділення
+print()
+print(x // y)
+# остача від ділення
+print()
+print(x % y)
+# піднесення до ступеня
+print(x ** y)
+# арифметичний вираз
+print(3.2 * 0.8 - 2 * 5 - 3 ** 3)
+# піднесення до ступеня, 0.5 – квадратний корінь
+print(4 ** 0.5)
+
+z = -2
+# модуль числа
+print(abs(z))
+# квадрат числа
+print(pow(z, 2), z ** 2)
+
+m = 3.26234234234
+# округлення числа до цілого та до одного знака після коми
+print(round(m), round(m, 4))` },
+    { name: "simple_calc.py (разом на уроці)", input: true, code:
+`print("Калькулятор: +, -, *, /")
+a = float(input("Перше число: "))
+b = float(input("Друге число: "))
+print("Сума:", a + b)
+print("Різниця:", a - b)
+print("Добуток:", a * b)
+print("Частка:", a / b)` }
+  ],
+
+  "cb-operators-table": [
+    { name: "10_operators.py", input: false, code:
+`a = 5
+b = 10
+
+a += b  # a = a + b = 5 + 10 = 15
+print(a)
+a -= b  # a = a - b = 5 - 10 = -5
+print(a)
+a *= b  # a = a * b = 5 * 10 = 50
+print(a)
+a /= b  # a = a / b = 5 / 10 = 0.5
+print(a)` }
+  ],
+
+  "cb-logical-table": [
+    { name: "8_logical_operations.py", input: false, code:
+`# Таблиця істинності логічних операцій
+
+print('And:')
+print(False and False)
+print(False and True)
+print(True and False)
+print(True and True)
+print()
+
+print('Or:')
+print(False or False)
+print(False or True)
+print(True or False)
+print(True or True)
+print()
+
+print('Not:')
+print(not False)
+print(not True)
+print()
+
+
+# Логічні вирази
+a = True
+b = False
+c = True
+f = a and not b or c or (a and (b or c))
+print(f)` }
+  ],
+
+  "cb-and": [
+    { name: "and.py", input: false, code:
+`age = 16
+has_money = True
+
+if age >= 16 and has_money:
+    print("✅ Можеш піти в кіно!")
+else:
+    print("❌ Не можна")` }
+  ],
+
+  "cb-or": [
+    { name: "or.py", input: false, code:
+`is_weekend = True
+is_holiday = False
+
+# Чи можу відпочивати?
+if is_weekend or is_holiday:
+    print("✅ Можеш відпочивати!")
+else:
+    print("❌ Треба працювати")` }
+  ],
+
+  "cb-not": [
+    { name: "not.py", input: false, code:
+`is_raining = False
+
+# Чи потрібна парасолька?
+if not is_raining:
+    print("✅ Парасолька не потрібна")
+else:
+    print("☔ Візьми парасольку")` }
+  ],
+
+  "cb-combine1": [
+    { name: "attraction.py", input: false, code:
+`age = 14
+height = 140
+
+# Від 16 років АБО (12+ і ріст 140+)
+if age >= 16 or (age >= 12 and height >= 140):
+    print("✅ Допуск є")
+else:
+    print("❌ Не допущено")` }
+  ],
+
+  "cb-combine2": [
+    { name: "discount.py", input: false, code:
+`is_student = True
+is_senior = False
+total = 500
+
+# Знижка студентам або пенсіонерам
+# І тільки якщо покупка від 300 грн
+if (is_student or is_senior) and total >= 300:
+    print("🎉 Знижка 10%")
+else:
+    print("Стандартна ціна")` }
+  ],
+
+  "cb-combine3": [
+    { name: "password.py", input: false, code:
+`password = "abc12345"
+length = len(password)
+
+# Пароль >= 8 символів І не є "12345678"
+if length >= 8 and not (password == "12345678"):
+    print("✅ Пароль прийнято")
+else:
+    print("❌ Слабкий пароль")` }
+  ],
+
+  "cb-comparisons": [
+    { name: "9_comparisons.py", input: true, code:
+`a = 2
+b = 5
+
+# менше
+print(a < b)
+# більше
+print(b > 3)
+# менше або дорівнює
+print(a <= 2)
+# більше або дорівнює
+print(b >= 7)
+# подвійне порівняння
+print(a < 3 < b)
+# рівність
+print(a == b)
+# нерівність
+print(a != b)
+# ідентичність об'єктів у пам'яті
+print(a is b)
+# a та b – різні об'єкти (хоча їх значення можуть бути рівними)
+print(a is not b)
+
+string = "some string"
+second_string = string
+third_string = input('Введіть рядок: ')
+
+print(string is second_string)
+print(string is third_string)` }
+  ],
+
+  "cb-str-intro": [
+    { name: "11_str.py", input: false, code:
+`# Приклади рядків
+s1 = "Рядок 1"
+s2 = 'Рядок 2'
+print(s1, s2)
+
+# Конструювання рядка з іншого значення
+s3 = str(8)
+print(s3)
+print(type(s3))
+
+# Багаторядкові рядки
+s4 = """
+Lesson 2. Variables and Data Types
+Some data types explained in this lesson:
+ - int
+ - bool
+ - float
+ - complex
+ - str
+"""
+print(s4)
+
+# \\ використовується, щоб продовжити рядок або будь-який вираз у Python з наступного рядка коду
+s5 = "started\\
+        continued"
+print(s5)` }
+  ],
+
+  "cb-case-length": [
+    { name: "12_length-of-a-string.py", input: true, code:
+`# Введення рядка
+string = input('Введіть рядок: ')
+
+# Виведення довжини рядка
+print('Довжина цього рядка:', len(string))` },
+    { name: "reg.py", input: true, code:
+`s = input("Введи фразу: ")
+
+print("Оригінал:", s)
+print("ВЕРХНІЙ РЕГІСТР:", s.upper())
+print("нижній регістр:", s.lower())
+print("З великої кожне слово:", s.title())
+print("Довжина (len):", len(s))` }
+  ],
+
+  "cb-indexing": [
+    { name: "17_string_indexing.py", input: false, code:
+`# Створення рядка
+string = "a string"
+
+# Виведення окремих символів рядка
+print(string[0])  # 'a'
+print(string[6])  # 'n'
+print(string[-2])  # 'n'
+print(string[-1])  # 'g'
+
+print(string[2]+string[-3])` },
+    { name: "15_iteration.py", input: false, code:
+`string = "Lorem ipsum dolor sit amet, consectetur adipisicing elit."
+
+# Ітерування
+for character in string:
+    print(character)
+
+# Отримання доступу до елементів за допомогою цілих ключів (індексація)
+print(string[0])
+print(string[2])
+print(string[-1])
+
+print(string[15::5])
+print(string[-15::5])
+
+print()
+
+# Довжина послідовності
+print('Length:', len(string))
+
+print('Min element in string:', min(string))
+print('Max element in string:', max(string))
+
+print()
+
+
+string2 = string.find("a") #вказує індекс першої "a"
+print(string2)
+print('New string is:', ((string + str(string2) + " ") * 3))` },
+    { name: "19_string_operations.py", input: false, code:
+`str1 = 'hel'
+str2 = 'lo'
+# конкатенація рядків
+result = str1 + str2
+
+print(result)
+
+# форматування рядків
+a = 48
+b = 73
+
+message = f'{a} - {b} = {a - b}'
+print(message)
+
+# індексація рядків
+s = 'Hello,_World!'
+
+# індексація починається з нуля
+print(s[0])
+# четвертий (п'ятий логічно) елемент (символ)
+print(s[4])
+# негативні числа - індексація з кінця
+print(s[-1])
+
+# символи з другого (включно) до сьомого (не включно)
+print(s[2:7])
+# те саме, але з кроком два
+print(s[2:7:2])
+
+print(s[:4:3])
+print(s[-1::-1])
+print(s[-1:0:-1])
+print(s[::-1])` }
+  ],
+
+  "cb-repeat": [
+    { name: "16_string_repeat.py", input: true, code:
+`# Повторення рядків
+s = input("Введіть фразу: ")
+n = int(input("Введіть кількість повторів: "))
+print((s * n))` }
+  ],
+
+  "cb-concat": [
+    { name: "21_conc.py", input: false, code:
+`first_name = "Anna"
+last_name  = "Petrenko"
+
+full_name = first_name + " " + last_name
+message   = "Привіт, " + full_name + "!"
+
+print(full_name)
+print(message)` }
+  ],
+
+  "cb-all-methods": [
+    { name: "20_string_methods.py", input: false, code:
+`string = "Lorem ipsum dolor sit amet, consectetur adipisicing elit."
+
+# Поділ рядка поелементний, при цьому створюється список
+print(string.split())
+
+print(string.strip()) #Видалення пробільних символів на початку і в кінці рядка
+print(string.count('s')) #рахує кількість елементу в дужках
+print(string.replace('Lorem', 'LOREM')) #заміняє перший елемент на другий
+
+print(str(len(string)).isdigit()) #перевіряє чи складається рядок з цифр
+
+print(string.title()) #кожне слово з великої букви
+print(string.capitalize()) #лише перший симол рядка в верхній регістр
+print(string.lower()) #нижній регістр
+print(string.upper()) #верхній регістр
+
+print(string.center(100, '$')) #Повертає відцентрований рядок, по краях якого стоїть символ fill (пробіл за замовчуванням)
+
+print(string.startswith('L'))
+print(string.endswith('.'))
+
+print('string'.isalpha()) #чи складається рядок з літер
+print(string.casefold()) #перетворює всі символи на нижній регістр і видаляє відмінності регістрів, що важливо для Unicode
+
+print(len("+++++++++++++++++++++Lorem ipsum dolor sit amet, consectetur adipisicing elit.++++++++++++++++++++++"))` }
+  ],
+
+  "cb-exercise1": [
+    { name: "exercise1.py", input: false, code:
+`string = " lorem Ipsum dolor Sit amet, consectetur adipisicing elit. "
+
+# 1) Remove spaces
+string = string.strip()
+
+# 2) Replace "lorem" with "LOREM"
+string = string.replace("lorem", "LOREM")
+
+# 3) Different formats
+print(string.upper())
+print(string.lower())
+print(string.title())
+print(string.capitalize())
+
+# 4) Checks
+print(string.casefold().count('i'))  # case insensitive count
+
+print(string.startswith("LOREM"))
+print(string.endswith("."))
+
+# 5) Centered
+print(string.center(80, '*'))` }
+  ],
+
+  "cb-unicode": [
+    { name: "unicode_demo.py", input: false, code:
+`print(ord("Б"))  # 1041
+print(chr(1041))  # Б` }
+  ],
+
+  "cb-hw1": [
+    { name: "дз_1.py", input: true, code:
+`word1 = input("Введіть перше слово: ")
+word2 = input("Введіть друге слово: ")
+
+print(word1 + "," + word2)` }
+  ],
+  "cb-hw2": [
+    { name: "дз_2.py", input: true, code:
+`a = int(input("Введіть число a: "))
+b = int(input("Введіть число b: "))
+x = int(input("Введіть число x: "))
+
+product = a * b * x
+print("Добуток:", product)` }
+  ],
+  "cb-hw3": [
+    { name: "дз_3.py", input: true, code:
+`a = float(input("Введіть a: "))
+b = float(input("Введіть b: "))
+c = float(input("Введіть c: "))
+
+D = b**2 - 4*a*c  # дискримінант
+
+x1 = (-b + D**0.5) / (2*a)
+x2 = (-b - D**0.5) / (2*a)
+
+print("x1 =", x1)
+print("x2 =", x2)
+# Якщо дискримінант від'ємний, D**0.5 автоматично дасть комплексне число` }
+  ],
+  "cb-hw4": [
+    { name: "дз_4.py", input: true, code:
+`text = input("Введіть текст: ")
+print(text[::-1])` }
+  ]
+};
+
+/* =====================================================================
+   PYODIDE
+   ===================================================================== */
+let pyodideReadyPromise = null;
+function setStatus(state, text){
+  const el = document.getElementById('pyoStatus');
+  const t = document.getElementById('pyoStatusText');
+  el.classList.remove('ready','loading');
+  if(state) el.classList.add(state);
+  t.textContent = text;
+}
+function getPyodide(){
+  if(!pyodideReadyPromise){
+    setStatus('loading', 'Python-середовище: завантаження…');
+    pyodideReadyPromise = loadPyodide().then(async (pyodide) => {
+      pyodide.globals.set("_js_prompt", (msg) => {
+        const v = window.prompt(msg && msg.length ? msg : "Введіть значення:");
+        return v === null ? "" : v;
+      });
+      await pyodide.runPythonAsync(`
+import builtins
+def input(prompt=""):
+    val = _js_prompt(prompt)
+    print(str(prompt) + str(val))
+    return val
+builtins.input = input
+`);
+      setStatus('ready', 'Python-середовище: готове');
+      return pyodide;
+    }).catch((e) => {
+      setStatus('loading', 'Не вдалося завантажити Python-середовище');
+      throw e;
+    });
+  }
+  return pyodideReadyPromise;
+}
+
+async function runSandbox(blockId, fileIndex, btn){
+  const output = document.getElementById(blockId + '-output-' + fileIndex);
+  const textarea = document.getElementById(blockId + '-code-' + fileIndex);
+  const code = textarea.value;
+  output.classList.add('visible');
+  output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>завантаження Python…';
+  btn.disabled = true;
+  try{
+    const pyodide = await getPyodide();
+    let buffer = [];
+    pyodide.setStdout({ batched: (s) => buffer.push(s) });
+    pyodide.setStderr({ batched: (s) => buffer.push(s) });
+    const globalsDict = pyodide.globals.get('dict')();
+    try{
+      await pyodide.runPythonAsync(code, { globals: globalsDict });
+    } catch(err){
+      buffer.push(String(err));
+    } finally {
+      globalsDict.destroy();
+      pyodide.setStdout({});
+      pyodide.setStderr({});
+    }
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>' + (buffer.length ? escapeHtml(buffer.join('\n')) : '(немає виводу)');
+  } catch(e){
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>Помилка запуску: ' + escapeHtml(String(e));
+  } finally {
+    btn.disabled = false;
+  }
+}
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.innerText = str;
+  return d.innerHTML;
+}
+
+function renderCodeBlock(blockId, files){
+  const container = document.getElementById(blockId);
+  if(!container) return;
+  const hasInput = files.some(f => f.input);
+  let tabsHtml = '';
+  if(files.length > 1){
+    tabsHtml = '<div class="cb-tabs">' + files.map((f,i) =>
+      `<div class="cb-tab${i===0?' active':''}" data-idx="${i}">${f.name}</div>`
+    ).join('') + '</div>';
+  } else {
+    tabsHtml = `<div class="cb-tabs"><div class="cb-label">${files[0].name}</div></div>`;
+  }
+  let editorsHtml = files.map((f,i) =>
+    `<textarea class="cb-editor" id="${blockId}-code-${i}" style="display:${i===0?'block':'none'}" spellcheck="false">${escapeHtml(f.code)}</textarea>`
+  ).join('');
+  let outputsHtml = files.map((f,i) =>
+    `<div class="cb-output" id="${blockId}-output-${i}"></div>`
+  ).join('');
+  container.innerHTML = tabsHtml + editorsHtml +
+    `<div class="cb-toolbar">
+      <button class="cb-run" id="${blockId}-run">▶ Запустити</button>
+      ${hasInput ? '<span class="cb-hint">💡 код запитує дані — браузер покаже віконце для введення</span>' : ''}
+    </div>` + outputsHtml;
+
+  let activeIdx = 0;
+  if(files.length > 1){
+    container.querySelectorAll('.cb-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const idx = parseInt(tab.dataset.idx, 10);
+        container.querySelectorAll('.cb-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        files.forEach((f,i) => {
+          document.getElementById(`${blockId}-code-${i}`).style.display = (i===idx) ? 'block' : 'none';
+          document.getElementById(`${blockId}-output-${i}`).classList.remove('visible');
+        });
+        activeIdx = idx;
+      });
+    });
+  }
+  document.getElementById(blockId + '-run').addEventListener('click', function(){
+    runSandbox(blockId, activeIdx, this);
+  });
+}
+
+/* =====================================================================
+   QUIZ (Перевір себе!)
+   ===================================================================== */
+const QUIZ_LOGIC = [
+  { stmt: "True and False", answer: "False" },
+  { stmt: "True or False", answer: "True" },
+  { stmt: "not False", answer: "True" },
+  { stmt: "(True and False) or (True and True)", answer: "True" },
+  { stmt: "not (True and False)", answer: "True" }
+];
+function renderQuiz(containerId, items){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML = items.map((it, i) => `
+    <div class="quiz-item">
+      <span class="stmt">${it.stmt}</span>
+      <button class="quiz-btn" data-idx="${i}">Показати</button>
+    </div>`).join('');
+  container.querySelectorAll('.quiz-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const it = items[parseInt(btn.dataset.idx,10)];
+      if(btn.classList.contains('shown')){
+        btn.textContent = 'Показати';
+        btn.classList.remove('shown');
+      } else {
+        btn.textContent = it.answer;
+        btn.classList.add('shown');
+      }
+    });
+  });
+}
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  // collapsible phases
+  document.querySelectorAll('[data-toggle]').forEach(header => {
+    header.addEventListener('click', () => {
+      const phase = header.closest('.phase');
+      const body = phase.querySelector('.phase-body');
+      const isOpen = phase.classList.contains('open');
+      if(isOpen){
+        body.style.maxHeight = body.scrollHeight + 'px';
+        requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
+        phase.classList.remove('open');
+      } else {
+        phase.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+        setTimeout(() => { if(phase.classList.contains('open')) body.style.maxHeight = 'none'; }, 360);
+      }
+    });
+  });
+
+  // reveal buttons
+  document.querySelectorAll('.reveal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.reveal);
+      const isOpen = target.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.innerHTML = (isOpen ? '<span class="chev">▸</span> Сховати відповідь' : '<span class="chev">▸</span> Перевір себе');
+    });
+  });
+
+  // render all code blocks
+  Object.keys(CODE_BLOCKS).forEach(id => renderCodeBlock(id, CODE_BLOCKS[id]));
+
+  // quiz
+  renderQuiz('quiz-logic', QUIZ_LOGIC);
+
+  // open first phase of each day by default
+  const firstDay1 = document.querySelector('#day1 ~ .phase');
+  if(firstDay1){
+    firstDay1.classList.add('open');
+    firstDay1.querySelector('.phase-body').style.maxHeight = 'none';
+  }
+});
+</script>
+</body>
+</html>
