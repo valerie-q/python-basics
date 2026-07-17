@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Lessons</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #222222;
+    --border2: #333333;
+    --text: #f0f0f0;
+    --muted: #666666;
+    --accent: #ff2d2d;
+    --accent-dim: #991a1a;
+    --accent-bg: rgba(255, 45, 45, 0.06);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 0 24px; width: 100%; }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 28px 0;
+  }
+  header .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .logo span { color: var(--accent); }
+  .logo-snake {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent-dim);
+    letter-spacing: 0.1em;
+  }
+
+  main {
+    flex: 1;
+    padding: 52px 0 60px;
+  }
+
+  .page-header {
+    margin-bottom: 48px;
+  }
+  .page-header h1 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  .page-header h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .page-header p {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .lessons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 14px;
+  }
+
+  .lesson-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .lesson-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .lesson-card:hover {
+    border-color: var(--border2);
+    background: var(--surface2);
+    transform: translateY(-2px);
+  }
+  .lesson-card:hover::before { opacity: 1; }
+
+  .lesson-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent-dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .lesson-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.35;
+  }
+  .lesson-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .lesson-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .lesson-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-dim);
+    border-radius: 4px;
+    padding: 3px 8px;
+  }
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 2;
+  }
+  .empty-state span { color: var(--accent); }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 0;
+    text-align: center;
+  }
+  footer p {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">Python <span>/</span> Lessons</div>
+    <div class="logo-snake">&gt;&gt;&gt; _</div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="page-header">
+      <h1>Вчимося<br><em>Python.</em></h1>
+      <p>// Всі матеріали з наших занять в одному місці.</p>
+    </div>
+
+    <div class="section-label">уроки</div>
+    <div class="lessons-grid" id="lessons-grid"></div>
+  </div>
+</main>
+
+<footer>
+  <p>python lessons portal</p>
+</footer>
+
+<script>
+// ============================================================
+// НАЛАШТУВАННЯ — РЕДАГУЙ ТУТ
+// ============================================================
+const LESSONS = [
+  {
+    title: "Знайомство з Python. Змінні та типи даних",
+    date: "01.06.2026",
+    file: "lessons/lesson1.html",
+    tag: "basics"
+  },
+  {
+    title: "Умови: if / elif / else",
+    date: "08.06.2026",
+    file: "lessons/lesson2.html",
+    tag: "basics"
+  },
+  {
+    title: "Цикли: for та while",
+    date: "15.06.2026",
+    file: "lessons/lesson3.html",
+    tag: "basics"
+  },
+  // ↓ ДОДАВАЙ НОВІ УРОКИ ТУТ ↓
+  // { title: "Назва уроку", date: "22.06.2026", file: "lessons/lesson4.html", tag: "functions" },
+];
+// ============================================================
+
+const grid = document.getElementById('lessons-grid');
+
+if (!LESSONS || LESSONS.length === 0) {
+  grid.innerHTML = '<div class="empty-state">// уроків ще немає<br><span>&gt;&gt;&gt;</span> скоро буде</div>';
+} else {
+  LESSONS.forEach((lesson, i) => {
+    const card = document.createElement('div');
+    card.className = 'lesson-card';
+    card.innerHTML = `
+      <div class="lesson-num">lesson ${String(i + 1).padStart(2, '0')}</div>
+      <div class="lesson-title">${lesson.title}</div>
+      <div class="lesson-footer">
+        <div class="lesson-date">${lesson.date}</div>
+        ${lesson.tag ? `<span class="lesson-tag">${lesson.tag}</span>` : ''}
+      </div>
+
+    `;
+    card.addEventListener('click', () => window.location.href = lesson.file);
+    grid.appendChild(card);
+  });
+}
+</script>
+</body>
+</html>
