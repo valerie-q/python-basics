@@ -126,6 +126,16 @@
   .img-frame svg{width:34px; height:34px; opacity:.5;}
   .img-frame .cap{font-family:var(--mono); font-size:.78rem; color:var(--ink-faint);}
 
+  .img-frame img{
+  max-width:100%;
+  max-height:340px;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  border-radius:8px;
+  display:block;
+}
+
   /* ---------- Code block / sandbox ---------- */
   .code-block{margin:16px 0; border:1px solid var(--rule); border-radius:12px; overflow:hidden; background:var(--panel);}
   .cb-tabs{display:flex; background:var(--code-bg); border-bottom:1px solid var(--rule); overflow-x:auto;}
