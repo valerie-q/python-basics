@@ -219,6 +219,29 @@
   .discuss-box{border:1px solid var(--rule); border-radius:12px; padding:16px 20px; background:var(--code-bg);}
   .discuss-box li{margin:8px 0;}
 
+
+
+
+
+  /* ---------- Truth table ---------- */
+table.truth{
+  width:100%; border-collapse:collapse; margin:16px 0;
+  border:1px dashed var(--rule); border-radius:12px; overflow:hidden;
+}
+table.truth th{
+  background:#EEF1FF; color:var(--ink); text-align:left; padding:12px 16px;
+  font-family:var(--display); font-weight:700; font-size:.95rem;
+}
+table.truth td{
+  padding:12px 16px; font-family:var(--sans); font-weight:600; font-size:.98rem;
+  border-top:1px solid var(--rule);
+}
+table.truth tr.true{background:#E6F6EA;}
+table.truth tr.false{background:#FDEAEA;}
+table.truth .mark{margin-right:6px;}
+
+
+  
   footer{
     max-width:880px; margin:60px auto 40px; padding:0 24px; color:var(--ink-faint); font-size:.85rem;
     font-family:var(--mono); border-top:1px solid var(--rule); padding-top:20px;
@@ -289,24 +312,37 @@
     <div class="code-block" id="cb-logical-table"></div>
 
     <h4 class="sub">Оператор AND</h4>
-    <div class="img-frame" data-caption="image2">
-      <img src='and.png'>
-    </div>
-    <p>Результат <span class="inline-code">True</span> тільки коли <strong>обидві</strong> умови істинні.</p>
+<table class="truth">
+  <tr><th>Умова 1</th><th>Умова 2</th><th>Результат</th></tr>
+  <tr class="false"><td>✅ True</td><td>✅ True</td><td>✅ True</td></tr>
+  <tr class="false"><td>✅ True</td><td>❌ False</td><td>❌ False</td></tr>
+  <tr class="false"><td>❌ False</td><td>✅ True</td><td>❌ False</td></tr>
+  <tr class="false"><td>❌ False</td><td>❌ False</td><td>❌ False</td></tr>
+</table>
+<p>Результат <span class="inline-code">True</span> тільки коли <strong>обидві</strong> умови істинні.</p>
+    
     <div class="code-block" id="cb-and"></div>
 
     <h4 class="sub">Оператор OR</h4>
-    <div class="img-frame" data-caption="image3">
-      <img src='or.png'>
-    </div>
+  
+<table class="truth">
+  <tr><th>Умова 1</th><th>Умова 2</th><th>Результат</th></tr>
+  <tr class="true"><td>✅ True</td><td>✅ True</td><td>✅ True</td></tr>
+  <tr class="true"><td>✅ True</td><td>❌ False</td><td>✅ True</td></tr>
+  <tr class="true"><td>❌ False</td><td>✅ True</td><td>✅ True</td></tr>
+  <tr class="false"><td>❌ False</td><td>❌ False</td><td>❌ False</td></tr>
+</table>
     <p>Результат <span class="inline-code">True</span>, коли <strong>хоча б одна</strong> умова істинна.</p>
     <div class="code-block" id="cb-or"></div>
 
     <h4 class="sub">Оператор NOT</h4>
-    <div class="img-frame" data-caption="image4">
-      <img src='not.png'>
-    </div>
-    <p>Перевертає значення: <span class="inline-code">True → False</span>, <span class="inline-code">False → True</span></p>
+<table class="truth">
+  <tr><th>Умова</th><th>Результат</th></tr>
+  <tr class="false"><td>✅ True</td><td>❌ False</td></tr>
+  <tr class="true"><td>❌ False</td><td>✅ True</td></tr>
+</table>
+<p>Перевертає значення: <span class="inline-code">True → False</span>, <span class="inline-code">False → True</span></p>
+
     <div class="code-block" id="cb-not"></div>
 
     <h4 class="sub">Комбінування операторів</h4>
