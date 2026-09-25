@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python · Розгалуження — Урок 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F5; --panel:#FFFFFF; --ink:#17151A; --ink-soft:#5B584F; --ink-faint:#918D82;
+    --red:#C81E1E; --red-deep:#8C1410; --red-wash:#FBEAE9; --rule:#E6E2D8; --code-bg:#F4F2EC;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'IBM Plex Sans', -apple-system, sans-serif;
+    --display:'Manrope', var(--sans);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.6; font-size:16px; -webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--red); color:#fff;}
+
+  header.hero{padding:56px 24px 32px; max-width:880px; margin:0 auto; border-bottom:1px solid var(--rule);}
+  .eyebrow{font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--red); font-weight:700; display:flex; align-items:center; gap:8px;}
+  .eyebrow::before{content:"›_"; color:var(--red);}
+  h1.title{font-family:var(--display); font-weight:800; font-size:clamp(1.8rem,4vw,2.6rem); margin:10px 0 6px; letter-spacing:-0.01em;}
+  .subtitle{color:var(--ink-soft); font-size:1.02rem; max-width:60ch;}
+  .pyostatus{margin-top:18px; display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:.8rem; color:var(--ink-soft); border:1px solid var(--rule); background:var(--panel); padding:6px 12px; border-radius:999px;}
+  .pyostatus .dot{width:8px; height:8px; border-radius:50%; background:var(--ink-faint); transition:background .3s;}
+  .pyostatus.ready .dot{background:#2E8B57;}
+  .pyostatus.loading .dot{background:var(--red); animation:blink 1s infinite;}
+  @keyframes blink{50%{opacity:.25;}}
+
+  main{max-width:880px; margin:0 auto; padding:28px 24px 100px;}
+
+  .phase{background:var(--panel); border:1px solid var(--rule); border-radius:14px; margin:18px 0; overflow:hidden;}
+  .phase-header{display:flex; align-items:center; gap:14px; padding:16px 20px; cursor:pointer; user-select:none;}
+  .phase-header .phase-num{font-family:var(--mono); color:var(--red); font-weight:700; font-size:.85rem; flex:0 0 auto;}
+  .phase-header h3{font-family:var(--display); font-weight:700; font-size:1.08rem; margin:0; flex:1;}
+  .phase-header .chev{font-family:var(--mono); color:var(--ink-faint); transition:transform .25s; font-size:.9rem;}
+  .phase.open .phase-header .chev{transform:rotate(90deg); color:var(--red);}
+  .phase-body{max-height:0; overflow:hidden; transition:max-height .35s ease; padding:0 22px;}
+  .phase.open .phase-body{padding:0 22px 22px;}
+  .phase-body > *:first-child{margin-top:0;}
+
+  h4.sub{font-family:var(--display); font-weight:700; font-size:1rem; margin:22px 0 8px; color:var(--ink);}
+  p{margin:10px 0;}
+  ul, ol{padding-left:1.3em;}
+  li{margin:5px 0;}
+  code.inline, .inline-code{font-family:var(--mono); background:var(--code-bg); padding:1px 6px; border-radius:5px; font-size:.9em;}
+  strong{color:var(--ink);}
+
+  blockquote.callout{
+    border-left:3px solid var(--red); background:var(--red-wash); margin:14px 0; padding:12px 16px; border-radius:0 10px 10px 0;
+    font-size:.95rem;
+  }
+  .algo-story{
+    display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;
+  }
+  .algo-story .col{border:1px solid var(--rule); border-radius:10px; padding:14px 16px; background:var(--code-bg);}
+  .algo-story .col h5{font-family:var(--display); font-size:.85rem; margin:0 0 8px; text-transform:uppercase; letter-spacing:.06em; color:var(--red-deep);}
+  .algo-story ul{margin:0; padding-left:1.1em; font-size:.9rem;}
+  @media (max-width:640px){ .algo-story{grid-template-columns:1fr;} }
+
+  .img-frame{
+    border:2px dashed var(--rule); border-radius:12px; padding:38px 20px;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    color:var(--ink-faint); background:repeating-linear-gradient(135deg, transparent, transparent 10px, #F1EFE8 10px, #F1EFE8 11px);
+    margin:16px 0; text-align:center;
+  }
+  .img-frame svg{width:34px; height:34px; opacity:.5;}
+  .img-frame .cap{font-family:var(--mono); font-size:.78rem; color:var(--ink-faint);}
+
+  .code-block{margin:16px 0; border:1px solid var(--rule); border-radius:12px; overflow:hidden; background:var(--panel);}
+  .cb-tabs{display:flex; background:var(--code-bg); border-bottom:1px solid var(--rule); overflow-x:auto;}
+  .cb-tab{font-family:var(--mono); font-size:.8rem; padding:9px 16px; cursor:pointer; white-space:nowrap; color:var(--ink-soft); border-right:1px solid var(--rule); background:transparent; border-top:2px solid transparent;}
+  .cb-tab.active{background:var(--panel); color:var(--ink); border-top:2px solid var(--red); font-weight:600;}
+  .cb-label{font-family:var(--mono); font-size:.75rem; color:var(--ink-faint); padding:9px 14px; border-right:1px solid var(--rule);}
+  .cb-editor{width:100%; border:none; resize:vertical; background:var(--code-bg); color:var(--ink); font-family:var(--mono); font-size:.87rem; line-height:1.55; padding:16px 18px; min-height:60px; display:block; tab-size:4;}
+  .cb-editor:focus{outline:none; background:#F8F6F0;}
+  .cb-toolbar{display:flex; align-items:center; gap:12px; padding:10px 16px; border-top:1px solid var(--rule);}
+  .cb-run{font-family:var(--mono); font-size:.82rem; font-weight:700; color:#fff; background:var(--red); border:none; border-radius:8px; padding:8px 18px; cursor:pointer; display:flex; align-items:center; gap:7px; transition:.15s;}
+  .cb-run:hover{background:var(--red-deep);}
+  .cb-run:disabled{background:var(--ink-faint); cursor:wait;}
+  .cb-hint{font-family:var(--mono); font-size:.74rem; color:var(--ink-faint);}
+  .cb-output{display:none; border-top:1px dashed var(--rule); padding:14px 18px; background:#FFFFFF; font-family:var(--mono); font-size:.85rem; white-space:pre-wrap; word-break:break-word;}
+  .cb-output.visible{display:block;}
+  .cb-output .tag{color:var(--red); font-weight:700; margin-right:4px;}
+
+  .task-card{border-left:4px solid var(--red); background:var(--panel); border-radius:0 12px 12px 0; padding:16px 20px; margin:16px 0; border-top:1px solid var(--rule); border-right:1px solid var(--rule); border-bottom:1px solid var(--rule);}
+  .task-card .task-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .task-badge{font-family:var(--mono); font-weight:700; font-size:.78rem; color:#fff; background:var(--red); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .task-title{font-family:var(--display); font-weight:700; font-size:1rem;}
+  .task-stars{font-size:.78rem; color:var(--red); margin-left:auto; font-family:var(--mono);}
+  .task-body{color:var(--ink); font-size:.96rem;}
+
+  .reveal-btn{margin-top:12px; font-family:var(--mono); font-size:.8rem; color:var(--red-deep); background:var(--red-wash); border:1px solid #EFC9C7; border-radius:8px; padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .reveal-btn:hover{background:#F6DAD8;}
+  .reveal-btn.open .chev{transform:rotate(90deg);}
+  .reveal-btn .chev{transition:transform .2s; display:inline-block;}
+  .reveal-content{display:none; margin-top:10px;}
+  .reveal-content.open{display:block;}
+
+  .discuss-box{border:1px solid var(--rule); border-radius:12px; padding:16px 20px; background:var(--code-bg);}
+  .discuss-box li{margin:8px 0;}
+
+  footer{max-width:880px; margin:60px auto 40px; padding:0 24px; color:var(--ink-faint); font-size:.85rem; font-family:var(--mono); border-top:1px solid var(--rule); padding-top:20px;}
+
+  @media (max-width:600px){ header.hero{padding:40px 16px 24px;} main{padding:20px 16px 80px;} .cb-editor{font-size:.8rem;} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">python · розгалуження · урок 1</div>
+  <h1 class="title">Алгоритми та оператор if</h1>
+  <p class="subtitle">Що таке алгоритм і програма, типи алгоритмів, простий if, однорядковий if, pass, if/else, elif, вкладені умови.</p>
+  <div class="pyostatus" id="pyoStatus"><span class="dot"></span><span id="pyoStatusText">Python-середовище: очікує запуску</span></div>
+</header>
+
+<main>
+
+<!-- PHASE 1 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">01</span>
+    <h3>Алгоритм і програма</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Вам потрібно навчити робота робити бутерброд зі згущеним молоком. Ваші інструкції можуть бути приблизно такими:</p>
+    <div class="algo-story">
+      <div class="col">
+        <h5>Для робота — програма</h5>
+        <ul>
+          <li>Відкрити нижні праві дверцята шафи.</li>
+          <li>Взяти банку зі згущеним молоком і вийняти її з шафи.</li>
+          <li>Закрити шафу.</li>
+          <li>Тримаючи банку в лівій руці, взяти кришку в праву руку.</li>
+          <li>Повертати праву руку проти годинникової стрілки, доки кришка не відкриється.</li>
+          <li>І так далі…</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>Для людини — алгоритм</h5>
+        <ul>
+          <li>Дістаньте згущене молоко і хліб.</li>
+          <li>Намажте ножем або ложкою згущене молоко на одну скибочку хліба.</li>
+          <li>Смачного!</li>
+        </ul>
+      </div>
+    </div>
+    <p>Перше — це <strong>програма</strong>: ви описали кожен крок, який комп'ютер повинен виконати, і вказали всю інформацію, яка потрібна для виконання кожного кроку. Друге — це <strong>алгоритм</strong>: процес, якому потрібно слідувати для отримання бажаного результату. Зверніть увагу, що <strong>алгоритм більш узагальнений, ніж програма</strong>.</p>
+    <p>Програма повідомляє роботу, звідки саме потрібно взяти предмети на конкретній кухні, з точною вказівкою всіх необхідних деталей. Це реалізація алгоритму, яка надає всі важливі деталі, але може бути виконана на будь-якому устаткуванні (в даному випадку — на кухні), з усіма необхідними елементами.</p>
+    <blockquote class="callout"><strong>Алгоритм</strong> — набір інструкцій, що описують порядок дій виконавця для досягнення результату розв'язання задачі за кінцеве число дій.</blockquote>
+
+    <h4 class="sub">Основні алгоритмічні структури</h4>
+    
+      <svg viewBox="0 0 760 260" xmlns="http://www.w3.org/2000/svg" font-family="'Manrope','IBM Plex Sans',sans-serif">
+        <rect x="0" y="0" width="760" height="260" fill="#FAF9F5"/>
+        <text x="380" y="34" text-anchor="middle" font-size="20" font-weight="800" fill="#17151A">Типи алгоритмів</text>
+        <g>
+          <rect x="30" y="60" width="160" height="170" rx="12" fill="#FFFFFF" stroke="#E6E2D8" stroke-width="1.5"/>
+          <text x="110" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#C81E1E">Лінійні</text>
+          <circle cx="65" cy="140" r="7" fill="#17151A"/>
+          <circle cx="110" cy="140" r="7" fill="#17151A"/>
+          <circle cx="155" cy="140" r="7" fill="#17151A"/>
+          <line x1="72" y1="140" x2="103" y2="140" stroke="#C81E1E" stroke-width="2" marker-end="url(#arrow)"/>
+          <line x1="117" y1="140" x2="148" y2="140" stroke="#C81E1E" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="110" y="195" text-anchor="middle" font-size="11" fill="#5B584F">крок за кроком</text>
+        </g>
+        <g>
+          <rect x="210" y="60" width="160" height="170" rx="12" fill="#FFFFFF" stroke="#E6E2D8" stroke-width="1.5"/>
+          <text x="290" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#C81E1E">Розгалужувані</text>
+          <polygon points="290,110 315,135 290,160 265,135" fill="#F4F2EC" stroke="#17151A" stroke-width="1.5"/>
+          <text x="290" y="139" text-anchor="middle" font-size="10" fill="#17151A">умова</text>
+          <line x1="290" y1="160" x2="255" y2="185" stroke="#C81E1E" stroke-width="2" marker-end="url(#arrow)"/>
+          <line x1="290" y1="160" x2="325" y2="185" stroke="#C81E1E" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="290" y="205" text-anchor="middle" font-size="11" fill="#5B584F">одна з гілок</text>
+        </g>
+        <g>
+          <rect x="390" y="60" width="160" height="170" rx="12" fill="#FFFFFF" stroke="#E6E2D8" stroke-width="1.5"/>
+          <text x="470" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#C81E1E">Циклічні</text>
+          <path d="M 445 150 A 25 25 0 1 1 470 175" fill="none" stroke="#17151A" stroke-width="2"/>
+          <polygon points="470,175 462,165 480,168" fill="#17151A"/>
+          <text x="470" y="205" text-anchor="middle" font-size="11" fill="#5B584F">повторення дій</text>
+        </g>
+        <g>
+          <rect x="570" y="60" width="160" height="170" rx="12" fill="#FFFFFF" stroke="#E6E2D8" stroke-width="1.5"/>
+          <text x="650" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#C81E1E">Змішані</text>
+          <rect x="620" y="115" width="26" height="26" fill="#F4F2EC" stroke="#17151A" stroke-width="1.5"/>
+          <polygon points="672,115 685,128 672,141 659,128" fill="#F4F2EC" stroke="#17151A" stroke-width="1.5"/>
+          <path d="M 630 160 A 15 15 0 1 1 645 175" fill="none" stroke="#17151A" stroke-width="2"/>
+          <text x="650" y="205" text-anchor="middle" font-size="11" fill="#5B584F">поєднання видів</text>
+        </g>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#C81E1E"/>
+          </marker>
+        </defs>
+      </svg>
+    
+    <p>Алгоритми бувають:</p>
+    <ul>
+      <li><strong>Лінійні</strong> — набір команд (вказівок), які виконуються послідовно в часі одна за одною.</li>
+      <li><strong>Розгалужувані</strong> — алгоритм, що містить хоча б одну умову, в результаті перевірки якої може здійснюватися поділ на кілька паралельних гілок алгоритму.</li>
+      <li><strong>Циклічні</strong> — алгоритм, що передбачає багаторазове повторення однієї й тієї ж дії над новими вихідними даними. До циклічних алгоритмів зводиться більшість методів обчислень, перебору варіантів.</li>
+      <li><strong>Змішані</strong> — поєднання кількох видів алгоритмів.</li>
+    </ul>
+    <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" font-family="'Manrope','IBM Plex Sans',sans-serif">
+      <rect x="0" y="0" width="700" height="160" fill="#FAF9F5"/>
+      <text x="350" y="28" text-anchor="middle" font-size="18" font-weight="800" fill="#17151A">Лінійний алгоритм</text>
+      <g font-size="13" fill="#17151A">
+        <rect x="30"  y="60" width="130" height="50" rx="10" fill="#FFFFFF" stroke="#17151A" stroke-width="1.5"/>
+        <text x="95" y="90" text-anchor="middle">Крок 1</text>
+        <rect x="200" y="60" width="130" height="50" rx="10" fill="#FFFFFF" stroke="#17151A" stroke-width="1.5"/>
+        <text x="265" y="90" text-anchor="middle">Крок 2</text>
+        <rect x="370" y="60" width="130" height="50" rx="10" fill="#FFFFFF" stroke="#17151A" stroke-width="1.5"/>
+        <text x="435" y="90" text-anchor="middle">Крок 3</text>
+        <rect x="540" y="60" width="130" height="50" rx="10" fill="#F4F2EC" stroke="#C81E1E" stroke-width="1.5"/>
+        <text x="605" y="90" text-anchor="middle" fill="#C81E1E" font-weight="700">Крок 4</text>
+      </g>
+      <line x1="160" y1="85" x2="196" y2="85" stroke="#C81E1E" stroke-width="2" marker-end="url(#arrow2)"/>
+      <line x1="330" y1="85" x2="366" y2="85" stroke="#C81E1E" stroke-width="2" marker-end="url(#arrow2)"/>
+      <line x1="500" y1="85" x2="536" y2="85" stroke="#C81E1E" stroke-width="2" marker-end="url(#arrow2)"/>
+      <text x="350" y="140" text-anchor="middle" font-size="12" fill="#5B584F">команди виконуються послідовно, одна за одною, без розгалужень</text>
+      <defs>
+        <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#C81E1E"/>
+        </marker>
+      </defs>
+    </svg>
+    <p><strong>Лінійний алгоритм</strong> — набір команд (вказівок), що виконуються послідовно в часі одна за одною.</p>
+
+    <svg viewBox="0 0 560 420" xmlns="http://www.w3.org/2000/svg" font-family="'Manrope','IBM Plex Sans',sans-serif">
+      <rect x="0" y="0" width="560" height="420" fill="#FAF9F5"/>
+      <text x="280" y="30" text-anchor="middle" font-size="18" font-weight="800" fill="#17151A">Алгоритм, що розгалужується</text>
+      <rect x="215" y="55" width="130" height="46" rx="23" fill="#17151A"/>
+      <text x="280" y="83" text-anchor="middle" font-size="13" fill="#FFFFFF">Початок</text>
+      <line x1="280" y1="101" x2="280" y2="130" stroke="#17151A" stroke-width="2" marker-end="url(#arrow3)"/>
+      <polygon points="280,130 360,185 280,240 200,185" fill="#F4F2EC" stroke="#17151A" stroke-width="1.5"/>
+      <text x="280" y="180" text-anchor="middle" font-size="13" fill="#17151A">Надворі</text>
+      <text x="280" y="197" text-anchor="middle" font-size="13" fill="#17151A">дощ?</text>
+      <line x1="200" y1="185" x2="152" y2="185" stroke="#C81E1E" stroke-width="2" marker-end="url(#arrow3)"/>
+      <text x="176" y="172" text-anchor="middle" font-size="12" fill="#C81E1E" font-weight="700">так</text>
+      <rect x="20" y="163" width="130" height="46" rx="10" fill="#FFFFFF" stroke="#C81E1E" stroke-width="1.5"/>
+      <text x="85" y="191" text-anchor="middle" font-size="12" fill="#17151A">Бери парасолю</text>
+      <line x1="360" y1="185" x2="408" y2="185" stroke="#C81E1E" stroke-width="2" marker-end="url(#arrow3)"/>
+      <text x="384" y="172" text-anchor="middle" font-size="12" fill="#C81E1E" font-weight="700">ні</text>
+      <rect x="410" y="163" width="130" height="46" rx="10" fill="#FFFFFF" stroke="#C81E1E" stroke-width="1.5"/>
+      <text x="475" y="185" text-anchor="middle" font-size="11.5" fill="#17151A">Не бери</text>
+      <text x="475" y="201" text-anchor="middle" font-size="11.5" fill="#17151A">парасолю</text>
+      <line x1="85" y1="209" x2="85" y2="320" stroke="#17151A" stroke-width="1.5"/>
+      <line x1="475" y1="209" x2="475" y2="320" stroke="#17151A" stroke-width="1.5"/>
+      <line x1="85" y1="320" x2="475" y2="320" stroke="#17151A" stroke-width="1.5"/>
+      <line x1="280" y1="240" x2="280" y2="320" stroke="#17151A" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="280" y1="320" x2="280" y2="345" stroke="#17151A" stroke-width="2" marker-end="url(#arrow3)"/>
+      <rect x="215" y="345" width="130" height="46" rx="23" fill="#17151A"/>
+      <text x="280" y="373" text-anchor="middle" font-size="13" fill="#FFFFFF">Кінець</text>
+      <defs>
+        <marker id="arrow3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#17151A"/>
+        </marker>
+      </defs>
+    </svg>
+    <p><strong>Алгоритм, що розгалужується</strong> — алгоритм, що містить хоча б одну умову, в результаті перевірки якої може здійснюватися поділ на кілька паралельних гілок алгоритму.</p>
+    <p>Тобто алгоритм, що розгалужується, містить умови, в залежності від яких виконується одна або інша послідовність дій. Кожна з них, у свою чергу, також може (але не зобов'язана) мати розгалуження.</p>
+    <blockquote class="callout">Приклад з реального життя: якщо надворі дощ → бери парасолю, інакше → не бери.</blockquote>
+
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" font-family="'Manrope','IBM Plex Sans',sans-serif">
+      <rect x="0" y="0" width="700" height="280" fill="#FAF9F5"/>
+      <text x="350" y="26" text-anchor="middle" font-size="18" font-weight="800" fill="#17151A">Як це працює?</text>
+      <text x="172" y="52" text-anchor="middle" font-size="12" fill="#C81E1E" font-weight="700">умова</text>
+      <line x1="172" y1="58" x2="185" y2="98" stroke="#C81E1E" stroke-width="1.5"/>
+      <text x="270" y="52" text-anchor="middle" font-size="12" fill="#C81E1E" font-weight="700">двокрапка</text>
+      <line x1="270" y1="58" x2="248" y2="98" stroke="#C81E1E" stroke-width="1.5"/>
+      <rect x="120" y="100" width="460" height="110" rx="10" fill="#17151A"/>
+      <text x="150" y="142" font-family="'JetBrains Mono',monospace" font-size="17" fill="#FFFFFF">if x &gt; 5:</text>
+      <text x="180" y="178" font-family="'JetBrains Mono',monospace" font-size="17" fill="#FFFFFF">print("x більше п'яти")</text>
+      <line x1="300" y1="210" x2="300" y2="235" stroke="#C81E1E" stroke-width="1.5"/>
+      <text x="350" y="255" text-anchor="middle" font-size="12.5" fill="#C81E1E" font-weight="700">блок операторів — відступ 4 пробіли</text>
+    </svg>
+  </div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">02</span>
+    <h3>Простий if</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Конструкція <span class="inline-code">if</span> у Python — це умовна команда, яка дозволяє програмі приймати рішення: виконувати певні дії лише тоді, коли умова є істинною (True).</p>
+    <pre class="inline-code" style="display:block; padding:12px 16px; white-space:pre;">if умова:
+    оператори</pre>
+    <p>Тут: <strong>умова</strong> — це логічний вираз, <strong>оператори</strong> — це послідовність будь-яких інших команд.</p>
+    <p>Блок операторів не може бути порожнім. Якщо така необхідність виникає, можна скористатися оператором <span class="inline-code">pass</span>, який нічого не робить.</p>
+    <p>Синтаксис — найважливіше: двокрапка після умови, відступ 4 пробіли.</p>
+    <div class="code-block" id="cb-simple-if"></div>
+  </div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">03</span>
+    <h3>Однорядковий if (небажаний)</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p><span class="inline-code">if умова: оператори</span> — тут оператори, якщо їх декілька, розділяються символом крапки з комою.</p>
+    <div class="code-block" id="cb-single-line-if"></div>
+  </div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">04</span>
+    <h3>Оператор pass</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Якщо блок порожній — Python вимагає хоч щось. Для цього є <span class="inline-code">pass</span>.</p>
+    <div class="code-block" id="cb-pass"></div>
+    <h4 class="sub">Для чого pass використовують на практиці</h4>
+    <ul>
+      <li>Коли умова є, але дії поки не потрібні</li>
+      <li>Коли пишуть структуру програми наперед</li>
+    </ul>
+    <p>Іноді програмісти спочатку роблять «скелет» програми, а код додають пізніше.</p>
+  </div>
+</section>
+
+<!-- PHASE 5 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">05</span>
+    <h3>if / else — два варіанти</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <pre class="inline-code" style="display:block; padding:12px 16px; white-space:pre;">if умова:
+    блок_операторів_1
+else:
+    блок_операторів_2</pre>
+    <p>Тут, якщо умова є істинною, виконуються оператори з першого блоку, інакше — з другого.</p>
+    <div class="code-block" id="cb-if-else"></div>
+  </div>
+</section>
+
+<!-- PHASE 6 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">06</span>
+    <h3>Розгалуження з кількома умовами (elif)</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono',monospace">
+      <rect x="0" y="0" width="640" height="260" rx="12" fill="#17151A"/>
+      <rect x="0" y="0" width="640" height="34" rx="12" fill="#26232A"/>
+      <rect x="0" y="20" width="640" height="14" fill="#26232A"/>
+      <circle cx="22" cy="17" r="6" fill="#C81E1E"/>
+      <circle cx="44" cy="17" r="6" fill="#5B584F"/>
+      <circle cx="66" cy="17" r="6" fill="#5B584F"/>
+      <text x="320" y="21" text-anchor="middle" font-size="11" fill="#918D82">6_elif_switch.py</text>
+      <text x="24" y="66"  font-size="14" fill="#FFFFFF">Меню:</text>
+      <text x="48" y="90"  font-size="14" fill="#FFFFFF">1. Файл</text>
+      <text x="48" y="114" font-size="14" fill="#FFFFFF">2. Вид</text>
+      <text x="48" y="138" font-size="14" fill="#FFFFFF">3. Вихід</text>
+      <text x="24" y="172" font-size="14" fill="#FFFFFF">Ваш вибір: <tspan fill="#C81E1E">2</tspan></text>
+      <text x="24" y="206" font-size="14" fill="#7BD88F">Ви відкрили меню "Вигляд"</text>
+      <rect x="24" y="216" width="9" height="16" fill="#C81E1E"/>
+    </svg>
+    <div class="code-block" id="cb-elif-switch"></div>
+  </div>
+</section>
+
+<!-- PHASE 7 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">07</span>
+    <h3>Вкладені if та if/elif/else</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Коли гілок більше двох — <span class="inline-code">elif</span> читабельніший за вкладені if:</p>
+    <div class="algo-story">
+      <div class="col">
+        <h5>❌ Без elif (погано виглядає)</h5>
+        <pre style="margin:0; font-family:var(--mono); font-size:.82rem; white-space:pre;">if y &lt; 0:
+    print('негативне')
+else:
+    if y &gt; 0:
+        print('позитивне')
+    else:
+        print('нуль')</pre>
+      </div>
+      <div class="col">
+        <h5>✅ З elif (чисто)</h5>
+        <pre style="margin:0; font-family:var(--mono); font-size:.82rem; white-space:pre;">if y &lt; 0:
+    print('негативне')
+elif y &gt; 0:
+    print('позитивне')
+else:
+    print('нуль')</pre>
+      </div>
+    </div>
+    <div class="code-block" id="cb-nested"></div>
+  </div>
+</section>
+
+<!-- PHASE 8 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">08</span>
+    <h3>Каскадування операторів розгалуження</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Часто виникає необхідність по черзі перевірити кілька умов (найчастіше — рівність якогось виразу певним значенням). Однак величезна кількість (каскад) вкладених умовних операторів виглядає нечитабельною, і при написанні такого коду легко припуститися помилки.</p>
+    <svg viewBox="0 0 520 470" xmlns="http://www.w3.org/2000/svg" font-family="'Manrope','IBM Plex Sans',sans-serif">
+      <rect x="0" y="0" width="520" height="470" fill="#FAF9F5"/>
+      <text x="260" y="28" text-anchor="middle" font-size="18" font-weight="800" fill="#17151A">Каскадування if — elif — elif — else</text>
+      <polygon points="180,50 300,95 180,140 60,95" fill="#F4F2EC" stroke="#17151A" stroke-width="1.5"/>
+      <text x="180" y="90" text-anchor="middle" font-size="12" fill="#17151A">y &lt; 0 ?</text>
+      <text x="180" y="106" font-family="'JetBrains Mono',monospace" text-anchor="middle" font-size="10" fill="#5B584F">if</text>
+      <line x1="300" y1="95" x2="380" y2="95" stroke="#C81E1E" stroke-width="2" marker-end="url(#a6)"/>
+      <text x="340" y="85" text-anchor="middle" font-size="11" fill="#C81E1E" font-weight="700">так</text>
+      <rect x="380" y="72" width="120" height="46" rx="10" fill="#FFFFFF" stroke="#C81E1E" stroke-width="1.5"/>
+      <text x="440" y="100" text-anchor="middle" font-size="12" fill="#17151A">негативне</text>
+      <line x1="180" y1="140" x2="180" y2="180" stroke="#17151A" stroke-width="2" marker-end="url(#a6)"/>
+      <text x="196" y="163" font-size="11" fill="#5B584F">ні</text>
+      <polygon points="180,180 300,225 180,270 60,225" fill="#F4F2EC" stroke="#17151A" stroke-width="1.5"/>
+      <text x="180" y="220" text-anchor="middle" font-size="12" fill="#17151A">y &gt; 0 ?</text>
+      <text x="180" y="236" font-family="'JetBrains Mono',monospace" text-anchor="middle" font-size="10" fill="#5B584F">elif</text>
+      <line x1="300" y1="225" x2="380" y2="225" stroke="#C81E1E" stroke-width="2" marker-end="url(#a6)"/>
+      <text x="340" y="215" text-anchor="middle" font-size="11" fill="#C81E1E" font-weight="700">так</text>
+      <rect x="380" y="202" width="120" height="46" rx="10" fill="#FFFFFF" stroke="#C81E1E" stroke-width="1.5"/>
+      <text x="440" y="230" text-anchor="middle" font-size="12" fill="#17151A">позитивне</text>
+      <line x1="180" y1="270" x2="180" y2="310" stroke="#17151A" stroke-width="2" marker-end="url(#a6)"/>
+      <text x="196" y="293" font-size="11" fill="#5B584F">ні</text>
+      <rect x="120" y="310" width="120" height="46" rx="10" fill="#17151A"/>
+      <text x="180" y="332" text-anchor="middle" font-size="11" fill="#918D82" font-family="'JetBrains Mono',monospace">else</text>
+      <text x="180" y="349" text-anchor="middle" font-size="12" fill="#FFFFFF">y = 0</text>
+      <text x="260" y="420" text-anchor="middle" font-size="12" fill="#5B584F">Кожна умова перевіряється, тільки якщо попередня була False.</text>
+      <text x="260" y="440" text-anchor="middle" font-size="12" fill="#5B584F">Щойно якась умова стає True — виконується її блок, і решта пропускається.</text>
+      <defs>
+        <marker id="a6" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#C81E1E"/>
+        </marker>
+      </defs>
+    </svg>
+    <h4 class="sub">Правила гри з IF-ELIF-ELSE</h4>
+    <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" font-family="'Manrope','IBM Plex Sans',sans-serif">
+      <rect x="0" y="0" width="700" height="300" fill="#FAF9F5"/>
+      <text x="350" y="30" text-anchor="middle" font-size="18" font-weight="800" fill="#17151A">Правила гри з IF — ELIF — ELSE</text>
+      <rect x="30" y="52" width="640" height="46" rx="10" fill="#FFFFFF" stroke="#E6E2D8" stroke-width="1.5"/>
+      <circle cx="58" cy="75" r="14" fill="#C81E1E"/>
+      <text x="58" y="80" text-anchor="middle" font-size="13" fill="#FFFFFF" font-family="'JetBrains Mono',monospace" font-weight="700">1</text>
+      <text x="86" y="72" font-size="13" fill="#17151A" font-weight="700">if</text>
+      <text x="86" y="90" font-size="12.5" fill="#5B584F">перевіряється завжди першою</text>
+      <rect x="30" y="108" width="640" height="46" rx="10" fill="#FFFFFF" stroke="#E6E2D8" stroke-width="1.5"/>
+      <circle cx="58" cy="131" r="14" fill="#C81E1E"/>
+      <text x="58" y="136" text-anchor="middle" font-size="13" fill="#FFFFFF" font-family="'JetBrains Mono',monospace" font-weight="700">2</text>
+      <text x="86" y="128" font-size="13" fill="#17151A" font-weight="700">elif</text>
+      <text x="86" y="146" font-size="12.5" fill="#5B584F">перевіряється, тільки якщо всі попередні умови були False</text>
+      <rect x="30" y="164" width="640" height="46" rx="10" fill="#FFFFFF" stroke="#E6E2D8" stroke-width="1.5"/>
+      <circle cx="58" cy="187" r="14" fill="#C81E1E"/>
+      <text x="58" y="192" text-anchor="middle" font-size="13" fill="#FFFFFF" font-family="'JetBrains Mono',monospace" font-weight="700">3</text>
+      <text x="86" y="184" font-size="13" fill="#17151A" font-weight="700">else</text>
+      <text x="86" y="202" font-size="12.5" fill="#5B584F">спрацьовує, якщо жодна з умов вище не була True</text>
+      <rect x="30" y="220" width="640" height="52" rx="10" fill="#17151A"/>
+      <circle cx="58" cy="246" r="14" fill="#FFFFFF"/>
+      <text x="58" y="251" text-anchor="middle" font-size="13" fill="#C81E1A" font-family="'JetBrains Mono',monospace" font-weight="700">!</text>
+      <text x="86" y="240" font-size="13" fill="#FFFFFF" font-weight="700">Головне правило</text>
+      <text x="86" y="258" font-size="12.5" fill="#F4F2EC">Виконується лише ОДНА гілка — щойно умова спрацювала, решта пропускається</text>
+    </svg>
+  </div>
+</section>
+
+<!-- PHASE 9 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">09</span>
+    <h3>Практика</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="task-card"><div class="task-head"><span class="task-badge">1</span><span class="task-title">Парне чи непарне</span><span class="task-stars">⭐</span></div><div class="task-body">Запитай число. Виведи «парне» або «непарне».</div></div>
+    <div class="task-card"><div class="task-head"><span class="task-badge">2</span><span class="task-title">Перевірка віку</span><span class="task-stars">⭐</span></div><div class="task-body">Запитай вік. Якщо &lt; 6 → «дитина», &lt; 18 → «підліток», &lt; 60 → «дорослий», інакше → «пенсіонер». Використай elif.</div></div>
+    <div class="task-card"><div class="task-head"><span class="task-badge">3</span><span class="task-title">Додатнє / від'ємне / нуль</span><span class="task-stars">⭐</span></div><div class="task-body">Користувач вводить ціле число. Виведи: positive, negative або zero.</div></div>
+    <div class="task-card"><div class="task-head"><span class="task-badge">4</span><span class="task-title">Більше з двох</span><span class="task-stars">⭐</span></div><div class="task-body">Зчитати два числа і вивести більше (якщо рівні — вивести будь-яке та підпис «рівні»).</div></div>
+    <div class="task-card"><div class="task-head"><span class="task-badge">5</span><span class="task-title">Лід, рідина чи пара</span><span class="task-stars">⭐</span></div><div class="task-body">≤0 — лід, ≥100 — пара, інакше — рідина.</div></div>
+    <div class="task-card"><div class="task-head"><span class="task-badge">6</span><span class="task-title">Належність діапазону</span><span class="task-stars">⭐⭐</span></div><div class="task-body">Вкажи, чи належить число закритому діапазону [1; 10].</div></div>
+    <div class="task-card"><div class="task-head"><span class="task-badge">7</span><span class="task-title">Від'ємне → додатне</span><span class="task-stars">⭐⭐</span></div><div class="task-body">Перетвори від'ємне число на додатне за допомогою if.</div></div>
+    <div class="task-card"><div class="task-head"><span class="task-badge">8</span><span class="task-title">Калькулятор операцій</span><span class="task-stars">⭐⭐</span></div><div class="task-body">Виведи меню: 1-додавання, 2-віднімання, 3-множення, 4-ділення. Запитай два числа та номер операції, виведи результат. При діленні на 0 — попередження.</div></div>
+    <div class="task-card"><div class="task-head"><span class="task-badge">9</span><span class="task-title">Впізнай мене</span><span class="task-stars">⭐</span></div><div class="task-body">Напишіть програму, яка запитує у користувача його ім'я, і якщо воно збігається з вашим — видає певне повідомлення.</div></div>
+  </div>
+</section>
+
+<!-- PHASE 10 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">10</span>
+    <h3>Закріплення матеріалу</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="discuss-box">
+      <ul>
+        <li>Що таке алгоритм?</li>
+        <li>Що таке алгоритм, що розгалужується?</li>
+        <li>Як створювати розгалуження в програмах на Python?</li>
+        <li>Як виглядає оператор if у Python? Охарактеризуйте його основні секції.</li>
+        <li>Навіщо потрібний оператор pass?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 11 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">11</span>
+    <h3>🧭 Домашнє завдання</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">1</span><span class="task-title">Температурний порадник</span></div>
+      <div class="task-body">Напиши програму, яка за температурою виводить: <em>дуже холодно</em> (&lt; 0), <em>прохолодно</em> (&lt; 15), <em>тепло</em> (&lt; 25), інакше — <em>спекотно</em>. Використай if/elif/else.</div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">2</span><span class="task-title">Пароль-сила</span></div>
+      <div class="task-body">Попроси користувача ввести пароль і виведи: <em>слабкий</em> (&lt; 6 символів), <em>середній</em> (6–10), <em>надійний</em> (&gt; 10). Підказка: використовуй <span class="inline-code">len()</span>.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>Python · Розгалуження — Урок 1 · сендбокси виконуються через Pyodide прямо в браузері</footer>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v314.0.2/full/pyodide.js"></script>
+<script>
+const CODE_BLOCKS = {
+  "cb-simple-if": [{ name: "1_simple_if.py", input:true, code:
+`x = int(input('x = '))
+
+# Якщо число x більше п'яти, то буде видано
+# відповідне повідомлення
+if x > 5:
+    print("x більше п'яти")` }],
+
+  "cb-single-line-if": [{ name: "2_single_line_if.py", input:true, code:
+`x = int(input('x = '))
+
+# така форма запису можлива, але небажана
+if x < 0: x += 1
+
+print(x)` }],
+
+  "cb-pass": [{ name: "10_pass.py", input:false, code:
+`value = None
+
+# Синтаксис мови вимагає, щоб у блоці був принаймні один оператор, тому існує спеціальний
+# оператор pass, який не робить нічого і який можна використовувати для різноманітних заглушок,
+# нереалізованого функціоналу і т.п.
+if value is not None:
+    pass  # TODO: add logic
+
+
+x = 10
+
+if x > 5:
+    pass
+else:
+    print("Число менше або дорівнює 5")
+
+
+choice = 2
+
+if choice == 1:
+    print("hello")
+elif choice == 2:
+    pass
+elif choice == 3:
+    print("Вихід")` }],
+
+  "cb-if-else": [{ name: "3_if_else.py", input:true, code:
+`x = int(input('x = '))
+
+if x > 0:
+    y = x ** 0.5
+else:
+    y = x ** 2
+
+print(y)` }],
+
+  "cb-elif-switch": [{ name: "6_elif_switch.py", input:true, code:
+`print('''\\nМеню:\\n\\t1. Файл\\n\\t2. Вид\\n\\t3. Вихід\\n''') #Три одинарні лапки означають багаторядковий рядок.
+#\\n означає новий рядок (Enter).
+#\\t робить відступ, як клавіша Tab.
+
+choice = int(input('Ваш вибір: '))
+
+if choice == 1:
+    print('Ви вибрали пункт меню "Файл"')
+elif choice == 2:
+    print('Ви відкрили меню "Вигляд"')
+elif choice == 3:
+    print('Завершення...')
+else:
+    print('Некоректний вибір')` }],
+
+  "cb-nested": [
+    { name: "4_nested_if_else.py", input:true, code:
+`x = int(input('x = '))
+
+if 0 < x < 7:
+    print('Значення x входить у заданий діапазон, продовжуємо')
+    y = 2 * x - 5
+
+    if y < 0:
+        print('Значення y негативне')
+    else:
+        if y > 0:
+            print('Значення y позитивне')
+        else:
+            print('y = 0')` },
+    { name: "5_nested_if_else_with_elif.py", input:true, code:
+`x = int(input('x = '))
+
+# Замінимо другий вкладений if у попередньому прикладі на оператор розгалуження з кількома умовами
+if 0 < x < 7:
+    print('Значення x входить у заданий діапазон, продовжуємо')
+    y = 2 * x - 5
+    if y < 0:
+        print('Значення y негативне')
+    elif y > 0:
+        print('Значення y позитивне')
+    else:
+        print('y = 0')` }
+  ]
+};
+
+let pyodideReadyPromise = null;
+function setStatus(state, text){
+  const el = document.getElementById('pyoStatus');
+  const t = document.getElementById('pyoStatusText');
+  el.classList.remove('ready','loading');
+  if(state) el.classList.add(state);
+  t.textContent = text;
+}
+function getPyodide(){
+  if(!pyodideReadyPromise){
+    setStatus('loading', 'Python-середовище: завантаження…');
+    pyodideReadyPromise = loadPyodide().then(async (pyodide) => {
+      pyodide.globals.set("_js_prompt", (msg) => {
+        const v = window.prompt(msg && msg.length ? msg : "Введіть значення:");
+        return v === null ? "" : v;
+      });
+      await pyodide.runPythonAsync(`
+import builtins
+def input(prompt=""):
+    val = _js_prompt(prompt)
+    print(str(prompt) + str(val))
+    return val
+builtins.input = input
+`);
+      setStatus('ready', 'Python-середовище: готове');
+      return pyodide;
+    }).catch((e) => {
+      setStatus('loading', 'Не вдалося завантажити Python-середовище');
+      throw e;
+    });
+  }
+  return pyodideReadyPromise;
+}
+function escapeHtml(str){
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+async function runSandbox(blockId, fileIndex, btn){
+  const output = document.getElementById(blockId + '-output-' + fileIndex);
+  const textarea = document.getElementById(blockId + '-code-' + fileIndex);
+  const code = textarea.value;
+  output.classList.add('visible');
+  output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>завантаження Python…';
+  btn.disabled = true;
+  try{
+    const pyodide = await getPyodide();
+    let buffer = [];
+    pyodide.setStdout({ batched: (s) => buffer.push(s) });
+    pyodide.setStderr({ batched: (s) => buffer.push(s) });
+    const globalsDict = pyodide.globals.get('dict')();
+    try{
+      await pyodide.runPythonAsync(code, { globals: globalsDict });
+    } catch(err){
+      buffer.push(String(err));
+    } finally {
+      globalsDict.destroy();
+      pyodide.setStdout({});
+      pyodide.setStderr({});
+    }
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>' + (buffer.length ? escapeHtml(buffer.join('\n')) : '(немає виводу)');
+  } catch(e){
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>Помилка запуску: ' + escapeHtml(String(e));
+  } finally {
+    btn.disabled = false;
+  }
+}
+function renderCodeBlock(blockId, files){
+  const container = document.getElementById(blockId);
+  if(!container) return;
+  const hasInput = files.some(f => f.input);
+  let tabsHtml = '';
+  if(files.length > 1){
+    tabsHtml = '<div class="cb-tabs">' + files.map((f,i) =>
+      `<div class="cb-tab${i===0?' active':''}" data-idx="${i}">${f.name}</div>`
+    ).join('') + '</div>';
+  } else {
+    tabsHtml = `<div class="cb-tabs"><div class="cb-label">${files[0].name}</div></div>`;
+  }
+  let editorsHtml = files.map((f,i) =>
+    `<textarea class="cb-editor" id="${blockId}-code-${i}" style="display:${i===0?'block':'none'}" spellcheck="false">${escapeHtml(f.code)}</textarea>`
+  ).join('');
+  let outputsHtml = files.map((f,i) => `<div class="cb-output" id="${blockId}-output-${i}"></div>`).join('');
+  container.innerHTML = tabsHtml + editorsHtml +
+    `<div class="cb-toolbar">
+      <button class="cb-run" id="${blockId}-run">▶ Запустити</button>
+      ${hasInput ? '<span class="cb-hint">💡 код запитує дані — браузер покаже віконце для введення</span>' : ''}
+    </div>` + outputsHtml;
+
+  let activeIdx = 0;
+  if(files.length > 1){
+    container.querySelectorAll('.cb-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const idx = parseInt(tab.dataset.idx, 10);
+        container.querySelectorAll('.cb-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        files.forEach((f,i) => {
+          document.getElementById(`${blockId}-code-${i}`).style.display = (i===idx) ? 'block' : 'none';
+          document.getElementById(`${blockId}-output-${i}`).classList.remove('visible');
+        });
+        activeIdx = idx;
+      });
+    });
+  }
+  document.getElementById(blockId + '-run').addEventListener('click', function(){
+    runSandbox(blockId, activeIdx, this);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-toggle]').forEach(header => {
+    header.addEventListener('click', () => {
+      const phase = header.closest('.phase');
+      const body = phase.querySelector('.phase-body');
+      const isOpen = phase.classList.contains('open');
+      if(isOpen){
+        body.style.maxHeight = body.scrollHeight + 'px';
+        requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
+        phase.classList.remove('open');
+      } else {
+        phase.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+        setTimeout(() => { if(phase.classList.contains('open')) body.style.maxHeight = 'none'; }, 360);
+      }
+    });
+  });
+  document.querySelectorAll('.reveal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.reveal);
+      const isOpen = target.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.innerHTML = (isOpen ? '<span class="chev">▸</span> Сховати відповідь' : '<span class="chev">▸</span> Перевір себе');
+    });
+  });
+  Object.keys(CODE_BLOCKS).forEach(id => renderCodeBlock(id, CODE_BLOCKS[id]));
+  const firstPhase = document.querySelector('.phase');
+  if(firstPhase){
+    firstPhase.classList.add('open');
+    firstPhase.querySelector('.phase-body').style.maxHeight = 'none';
+  }
+});
+</script>
+</body>
+</html>
