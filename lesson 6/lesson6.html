@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python · IF — Урок 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F5; --panel:#FFFFFF; --ink:#17151A; --ink-soft:#5B584F; --ink-faint:#918D82;
+    --red:#C81E1E; --red-deep:#8C1410; --red-wash:#FBEAE9; --rule:#E6E2D8; --code-bg:#F4F2EC;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'IBM Plex Sans', -apple-system, sans-serif;
+    --display:'Manrope', var(--sans);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.6; font-size:16px; -webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--red); color:#fff;}
+
+  header.hero{padding:56px 24px 32px; max-width:880px; margin:0 auto; border-bottom:1px solid var(--rule);}
+  .eyebrow{font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--red); font-weight:700; display:flex; align-items:center; gap:8px;}
+  .eyebrow::before{content:"›_"; color:var(--red);}
+  h1.title{font-family:var(--display); font-weight:800; font-size:clamp(1.8rem,4vw,2.6rem); margin:10px 0 6px; letter-spacing:-0.01em;}
+  .subtitle{color:var(--ink-soft); font-size:1.02rem; max-width:60ch;}
+  .pyostatus{margin-top:18px; display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:.8rem; color:var(--ink-soft); border:1px solid var(--rule); background:var(--panel); padding:6px 12px; border-radius:999px;}
+  .pyostatus .dot{width:8px; height:8px; border-radius:50%; background:var(--ink-faint); transition:background .3s;}
+  .pyostatus.ready .dot{background:#2E8B57;}
+  .pyostatus.loading .dot{background:var(--red); animation:blink 1s infinite;}
+  @keyframes blink{50%{opacity:.25;}}
+
+  nav.daynav{position:sticky; top:0; z-index:20; background:rgba(250,249,245,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--rule); padding:10px 24px;}
+  nav.daynav .wrap{max-width:880px; margin:0 auto; display:flex; gap:8px; flex-wrap:wrap;}
+  nav.daynav a{font-family:var(--mono); font-size:.78rem; text-decoration:none; color:var(--ink-soft); border:1px solid var(--rule); padding:5px 12px; border-radius:999px; background:var(--panel); transition:.15s;}
+  nav.daynav a:hover{border-color:var(--red); color:var(--red-deep);}
+
+  main{max-width:880px; margin:0 auto; padding:8px 24px 100px;}
+
+  .phase{background:var(--panel); border:1px solid var(--rule); border-radius:14px; margin:18px 0; overflow:hidden;}
+  .phase-header{display:flex; align-items:center; gap:14px; padding:16px 20px; cursor:pointer; user-select:none;}
+  .phase-header .phase-num{font-family:var(--mono); color:var(--red); font-weight:700; font-size:.85rem; flex:0 0 auto;}
+  .phase-header h3{font-family:var(--display); font-weight:700; font-size:1.08rem; margin:0; flex:1;}
+  .phase-header .chev{font-family:var(--mono); color:var(--ink-faint); transition:transform .25s; font-size:.9rem;}
+  .phase.open .phase-header .chev{transform:rotate(90deg); color:var(--red);}
+  .phase-body{max-height:0; overflow:hidden; transition:max-height .35s ease; padding:0 22px;}
+  .phase.open .phase-body{padding:0 22px 22px;}
+  .phase-body > *:first-child{margin-top:0;}
+
+  h4.sub{font-family:var(--display); font-weight:700; font-size:1rem; margin:22px 0 8px; color:var(--ink);}
+  p{margin:10px 0;}
+  ul, ol{padding-left:1.3em;}
+  li{margin:5px 0;}
+  code.inline, .inline-code{font-family:var(--mono); background:var(--code-bg); padding:1px 6px; border-radius:5px; font-size:.9em;}
+  strong{color:var(--ink);}
+  pre.static{margin:10px 0; padding:14px 18px; background:var(--code-bg); border:1px solid var(--rule); border-radius:10px; font-family:var(--mono); font-size:.85rem; white-space:pre; overflow-x:auto;}
+
+  blockquote.callout{border-left:3px solid var(--red); background:var(--red-wash); margin:14px 0; padding:12px 16px; border-radius:0 10px 10px 0; font-size:.95rem;}
+  blockquote.callout.warn{border-left-color:var(--ink-faint); background:var(--code-bg);}
+  .callout ul{margin:6px 0 0;}
+
+  table.reftable{width:100%; border-collapse:collapse; margin:16px 0; font-size:.92rem;}
+  table.reftable th{background:var(--red); color:#fff; text-align:left; padding:9px 12px; font-family:var(--display); font-weight:700; font-size:.85rem;}
+  table.reftable td{padding:8px 12px; border-bottom:1px solid var(--rule);}
+  table.reftable td:first-child{font-family:var(--mono); white-space:nowrap; color:var(--red-deep);}
+  table.reftable tr:nth-child(even){background:var(--code-bg);}
+
+  .code-block{margin:16px 0; border:1px solid var(--rule); border-radius:12px; overflow:hidden; background:var(--panel);}
+  .cb-tabs{display:flex; background:var(--code-bg); border-bottom:1px solid var(--rule); overflow-x:auto;}
+  .cb-tab{font-family:var(--mono); font-size:.8rem; padding:9px 16px; cursor:pointer; white-space:nowrap; color:var(--ink-soft); border-right:1px solid var(--rule); background:transparent; border-top:2px solid transparent;}
+  .cb-tab.active{background:var(--panel); color:var(--ink); border-top:2px solid var(--red); font-weight:600;}
+  .cb-label{font-family:var(--mono); font-size:.75rem; color:var(--ink-faint); padding:9px 14px; border-right:1px solid var(--rule);}
+  .cb-editor{width:100%; border:none; resize:vertical; background:var(--code-bg); color:var(--ink); font-family:var(--mono); font-size:.87rem; line-height:1.55; padding:16px 18px; min-height:60px; display:block; tab-size:4;}
+  .cb-editor:focus{outline:none; background:#F8F6F0;}
+  .cb-toolbar{display:flex; align-items:center; gap:12px; padding:10px 16px; border-top:1px solid var(--rule);}
+  .cb-run{font-family:var(--mono); font-size:.82rem; font-weight:700; color:#fff; background:var(--red); border:none; border-radius:8px; padding:8px 18px; cursor:pointer; display:flex; align-items:center; gap:7px; transition:.15s;}
+  .cb-run:hover{background:var(--red-deep);}
+  .cb-run:disabled{background:var(--ink-faint); cursor:wait;}
+  .cb-hint{font-family:var(--mono); font-size:.74rem; color:var(--ink-faint);}
+  .cb-output{display:none; border-top:1px dashed var(--rule); padding:14px 18px; background:#FFFFFF; font-family:var(--mono); font-size:.85rem; white-space:pre-wrap; word-break:break-word;}
+  .cb-output.visible{display:block;}
+  .cb-output .tag{color:var(--red); font-weight:700; margin-right:4px;}
+
+  .task-card{border-left:4px solid var(--red); background:var(--panel); border-radius:0 12px 12px 0; padding:16px 20px; margin:16px 0; border-top:1px solid var(--rule); border-right:1px solid var(--rule); border-bottom:1px solid var(--rule);}
+  .task-card .task-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .task-badge{font-family:var(--mono); font-weight:700; font-size:.78rem; color:#fff; background:var(--red); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .task-title{font-family:var(--display); font-weight:700; font-size:1rem;}
+  .task-stars{font-size:.78rem; color:var(--red); margin-left:auto; font-family:var(--mono);}
+  .task-body{color:var(--ink); font-size:.96rem;}
+
+  .reveal-btn{margin-top:12px; font-family:var(--mono); font-size:.8rem; color:var(--red-deep); background:var(--red-wash); border:1px solid #EFC9C7; border-radius:8px; padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .reveal-btn:hover{background:#F6DAD8;}
+  .reveal-btn.open .chev{transform:rotate(90deg);}
+  .reveal-btn .chev{transition:transform .2s; display:inline-block;}
+  .reveal-content{display:none; margin-top:10px;}
+  .reveal-content.open{display:block;}
+  .reveal-tip{font-size:.85rem; color:var(--ink-soft); font-style:italic; margin:8px 0 0;}
+
+  footer{max-width:880px; margin:60px auto 40px; padding:0 24px; color:var(--ink-faint); font-size:.85rem; font-family:var(--mono); border-top:1px solid var(--rule); padding-top:20px;}
+
+  @media (max-width:600px){ header.hero{padding:40px 16px 24px;} main{padding:8px 16px 80px;} .cb-editor{font-size:.8rem;} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">python · IF · урок 2</div>
+  <h1 class="title">Тернарний оператор, Truth Value, and/or/not</h1>
+  <div class="pyostatus" id="pyoStatus"><span class="dot"></span><span id="pyoStatusText">Python-середовище: очікує запуску</span></div>
+</header>
+
+<nav class="daynav">
+  <div class="wrap">
+    <a href="#theory">Теорія</a>
+    <a href="#practice">Практика</a>
+    <a href="#homework">Домашнє завдання</a>
+    <a href="#extra">Додаткові завдання</a>
+  </div>
+</nav>
+
+<main>
+
+<div id="theory"></div>
+
+<!-- PHASE 1 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">01</span>
+    <h3>Truth Value Testing</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>В Python будь-яке значення можна використати як True або False — не тільки bool.</p>
+    <blockquote class="callout">
+      <strong>❌ Вважаються False:</strong><br>
+      <span class="inline-code">None, False, 0, 0.0, 0j, '' (порожній рядок), [], {}, ()</span><br>
+      <em>Все інше — вважається True.</em>
+    </blockquote>
+    <p>Навіщо це потрібно? Дозволяє писати коротший і читабельніший код:</p>
+    <pre class="static"># Довгий варіант:
+if string is not None and string != '':
+    num = int(string)
+
+# Короткий варіант (те саме!):
+if string:  # перевіряє чи змінна string не false
+    num = int(string)
+
+# Ще приклади:
+number = 0
+if number:  # False, бо 0
+    print('не нуль')
+
+name = 'Андрій'
+if name:  # True, бо рядок не порожній
+    print('привіт,', name)</pre>
+    <blockquote class="callout">
+      <strong>💡 Запам'ятай:</strong><br>
+      <span class="inline-code">if x:</span> → те саме що <span class="inline-code">if x != 0 and x is not None</span><br>
+      <span class="inline-code">if not x:</span> → те саме що <span class="inline-code">if x == 0 or x is None or x == ''</span>
+    </blockquote>
+    <div class="code-block" id="cb-truthvalue"></div>
+    <h4 class="sub">Що таке .format()?</h4>
+<p>У файлі вище є рядок <span class="inline-code">'The string is {}'.format(string)</span>. Це спосіб вставити значення змінних у текст: у рядку ставимо <span class="inline-code">{}</span> як порожні місця, а в дужках після <span class="inline-code">.format</span> перераховуємо, що туди підставити.</p>
+<div class="code-block" id="cb-format"></div>
+<blockquote class="callout">F-рядок і <span class="inline-code">.format()</span> роблять одне й те саме. F-рядок коротший, тому зараз зазвичай пишуть так, а <span class="inline-code">.format()</span> часто зустрічається в чужому коді.</blockquote>
+  </div>
+  
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">02</span>
+    <h3>Тернарний оператор (умовний вираз)</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Досить часто виникає ситуація, коли нам потрібно використовувати той чи інший вираз в залежності від певної умови. У Python існує конструкція, яка за своєю дією аналогічна конструкції if-else, але при цьому є умовним виразом.</p>
+    <p><strong>Тернарний оператор</strong> — це скорочений спосіб записати if/else в одному рядку. Він єдиний в Python, що потребує три операнди: що повернути, умова, що якщо ні.</p>
+    <blockquote class="callout"><strong>Синтаксис:</strong><br><span class="inline-code">вираз_якщо_True if умова else вираз_якщо_False</span></blockquote>
+    <p>Порівняй два варіанти — вони роблять одне і те саме:</p>
+    <div class="code-block" id="cb-ternary"></div>
+    <blockquote class="callout warn">
+      <strong>⚠️ Коли НЕ варто використовувати тернарний:</strong><br>
+      Якщо вираз стає занадто довгим або заплутаним — краще звичайний if/else.
+      <pre class="static" style="background:transparent; border:none; padding:8px 0 0; margin:6px 0 0;"># Погано — важко читати:
+x = 'A' if a > b else 'B' if b > c else 'C'</pre>
+    </blockquote>
+  </div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">03</span>
+    <h3>Складні умови: and, or, not</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <p>Іноді одна умова недостатня — потрібно перевірити кілька речей одразу.</p>
+    <h4 class="sub">and — обидві умови мають бути True</h4>
+    <div class="code-block" id="cb-and"></div>
+    <h4 class="sub">or — достатньо однієї умови</h4>
+    <div class="code-block" id="cb-or"></div>
+    <h4 class="sub">not — заперечення умови</h4>
+    <div class="code-block" id="cb-not"></div>
+    <h4 class="sub">Пріоритет операторів</h4>
+    <p>Важливо знати порядок виконання: <strong>not → and → or</strong></p>
+    <pre class="static"># not виконується першим:
+if not a and b:       # (not a) and b
+
+# and виконується перед or:
+if a or b and c:      # a or (b and c)
+
+# Для зрозумілості — завжди використовуй дужки!
+if (age >= 18 and has_id) or is_vip:
+    print('дозволено')</pre>
+    <h4 class="sub">📊 Таблиця істинності (швидка шпаргалка)</h4>
+    <table class="reftable">
+      <tr><th>Вираз</th><th>Результат</th></tr>
+      <tr><td>True and True</td><td>True</td></tr>
+      <tr><td>True and False</td><td>False</td></tr>
+      <tr><td>False and False</td><td>False</td></tr>
+      <tr><td>True or True</td><td>True</td></tr>
+      <tr><td>True or False</td><td>True</td></tr>
+      <tr><td>False or False</td><td>False</td></tr>
+      <tr><td>not True</td><td>False</td></tr>
+      <tr><td>not False</td><td>True</td></tr>
+    </table>
+  </div>
+</section>
+
+<div id="practice"></div>
+
+<!-- PHASE 4 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">04</span>
+    <h3>⭐ Практика — Рівень 1 (truth value + тернарний)</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">1</span><span class="task-title">Порожній рядок</span><span class="task-stars">⭐</span></div>
+      <div class="task-body">Запитай ім'я користувача. Якщо він нічого не ввів (порожній рядок) — виведи «Ім'я не вказано», інакше — «Привіт, [ім'я]!». Використай truth value (не порівнюй з '').</div>
+      <button class="reveal-btn" data-reveal="rv-p1"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p1"><div class="code-block" id="cb-p1"></div><p class="reveal-tip">💡 if name: — те саме що if name != '' and name is not None</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">2</span><span class="task-title">Нульова оцінка</span><span class="task-stars">⭐</span></div>
+      <div class="task-body">Запитай оцінку (число). Виведи «оцінка є» або «оцінка відсутня» — використай truth value. Підказка: 0 вважається False.</div>
+      <button class="reveal-btn" data-reveal="rv-p2"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p2"><div class="code-block" id="cb-p2"></div><p class="reveal-tip">💡 Якщо score = 0 → False, якщо будь-яке інше число → True</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">3</span><span class="task-title">Модуль числа</span><span class="task-stars">⭐</span></div>
+      <div class="task-body">Запитай число. Виведи його модуль (без від'ємного знаку). Використай тернарний оператор в одному рядку.</div>
+      <button class="reveal-btn" data-reveal="rv-p3"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p3"><div class="code-block" id="cb-p3"></div><p class="reveal-tip">💡 Якщо число >= 0 → залишаємо як є, інакше → множимо на -1</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">4</span><span class="task-title">Більше чи менше</span><span class="task-stars">⭐</span></div>
+      <div class="task-body">Запитай два числа a і b. Одним рядком (тернарний) виведи: «a більше», «b більше» або «рівні».</div>
+      <button class="reveal-btn" data-reveal="rv-p4"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p4"><div class="code-block" id="cb-p4"></div><p class="reveal-tip">💡 Вкладений тернарний: спочатку перевіряємо a &gt; b, потім b &gt; a, інакше рівні</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">5</span><span class="task-title">Парне / непарне (тернарний)</span><span class="task-stars">⭐</span></div>
+      <div class="task-body">Запитай число. Одним рядком через тернарний оператор виведи «парне» або «непарне».</div>
+      <button class="reveal-btn" data-reveal="rv-p5"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p5"><div class="code-block" id="cb-p5"></div><p class="reveal-tip">💡 % 2 == 0 → ділиться на 2 без остачі → парне</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 5 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">05</span>
+    <h3>⭐⭐ Практика — Рівень 2 (and, or, not)</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">6</span><span class="task-title">Вхід у систему</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Задай у коді логін = 'admin' і пароль = '1234'. Запитай логін і пароль у користувача. Використай and: якщо обидва збігаються — «Вхід успішний», інакше — «Невірні дані».</div>
+      <button class="reveal-btn" data-reveal="rv-p6"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p6"><div class="code-block" id="cb-p6"></div><p class="reveal-tip">💡 and — обидві умови мають бути True одночасно</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">7</span><span class="task-title">Вихідний день</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Запитай день тижня. Якщо «субота» або «неділя» — виведи «Вихідний, відпочиваємо!», інакше — «Робочий день, до справ!»</div>
+      <button class="reveal-btn" data-reveal="rv-p7"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p7"><div class="code-block" id="cb-p7"></div><p class="reveal-tip">💡 .lower() — щоб не залежати від регістру вводу</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">8</span><span class="task-title">Допуск до іспиту</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Запитай кількість відвідувань (з 10) та середній бал (1-12). Студент допускається до іспиту якщо: відвідувань >= 7 і бал >= 4. Виведи відповідне повідомлення та причину недопущення.</div>
+      <button class="reveal-btn" data-reveal="rv-p8"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p8"><div class="code-block" id="cb-p8"></div><p class="reveal-tip">💡 Бонус: виводимо причину відмови — корисно для користувача</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">9</span><span class="task-title">Знижка у магазині</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Запитай вік та чи є студентський квиток ('так'/'ні'). Ціна товару = 500 грн.<br>• Якщо вік &lt; 18 або є студентський → знижка 20%<br>• Якщо вік &gt; 60 → знижка 30%<br>• Інакше → повна ціна. Виведи фінальну ціну.</div>
+      <button class="reveal-btn" data-reveal="rv-p9"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p9"><div class="code-block" id="cb-p9"></div><p class="reveal-tip">💡 Перевіряємо вік &gt; 60 першим, бо ця знижка більша</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 6 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">06</span>
+    <h3>⭐⭐⭐ Практика — Рівень 3 (комбіновані задачі)</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">10</span><span class="task-title">Класифікатор оцінок</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Запитай оцінку (1–12). Виведи: 10–12 → «Відмінно», 7–9 → «Добре», 4–6 → «Задовільно», 1–3 → «Незадовільно», інше → «Некоректна оцінка». Використай and для перевірки діапазону та коротший запис діапазону.</div>
+      <button class="reveal-btn" data-reveal="rv-p10"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p10"><div class="code-block" id="cb-p10"></div><p class="reveal-tip">💡 Python дозволяє 10 &lt;= score &lt;= 12 замість score &gt;= 10 and score &lt;= 12</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">11</span><span class="task-title">Вікторина на 3 питання</span><span class="task-stars">⭐⭐⭐</span></div>
+      <div class="task-body">Задай 3 питання з варіантами відповіді. Підраховуй бали за правильні. Наприкінці виведи результат: 3/3 → «Відмінно!», 2/3 → «Добре!», 1/3 → «Спробуй ще», 0/3 → «Готуйся краще». Використай тернарний оператор хоча б для одного повідомлення.</div>
+      <button class="reveal-btn" data-reveal="rv-p11"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p11"><div class="code-block" id="cb-p11"></div><p class="reveal-tip">💡 Тернарний використано для розрізнення score == 1 та score == 0</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">12</span><span class="task-title">Перепиши калькулятор</span><span class="task-stars">⭐⭐⭐</span></div>
+      <div class="task-body">Візьми калькулятор з Уроку 1. Перепиши перевірку ділення на 0 за допомогою тернарного оператора. Додай перевірку: якщо користувач не ввів число (порожній рядок) — виведи «Помилка вводу» (truth value).</div>
+      <button class="reveal-btn" data-reveal="rv-p12"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-p12"><div class="code-block" id="cb-p12"></div><p class="reveal-tip">💡 if not a_str — truth value: порожній рядок = False, not False = True</p></div>
+    </div>
+  </div>
+</section>
+
+<div id="homework"></div>
+
+<!-- PHASE 7 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">07</span>
+    <h3>🧭 Домашнє завдання</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">1</span><span class="task-title">Калькулятор знижок</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Магазин дає знижку якщо: сума покупки &gt; 1000 грн → знижка 10%; є картка лояльності → ще +5%; обидві умови → знижка 15%. Запитай суму і чи є картка. Виведи фінальну ціну одним рядком (тернарний).</div>
+      <button class="reveal-btn" data-reveal="rv-hw1"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-hw1"><div class="code-block" id="cb-hw1"></div><p class="reveal-tip">💡 Зберігаємо умови в змінні big_purchase і loyalty_card — код читабельніший</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">2</span><span class="task-title">Охоронець клубу</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Клуб пускає якщо: вік &gt;= 18 AND є паспорт, АБО є VIP-запрошення (незалежно від віку). Запитай вік, наявність паспорту та VIP. Виведи «Заходьте!» або «Вхід заборонено».</div>
+      <button class="reveal-btn" data-reveal="rv-hw2"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-hw2"><div class="code-block" id="cb-hw2"></div><p class="reveal-tip">💡 Дужки важливі! is_vip or (age >= 18 and has_passport) — and виконується першим</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 8 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">08</span>
+    <h3>📋 Коротко</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <ul>
+      <li>Truth value — будь-яке значення може бути True/False</li>
+      <li>None, 0, '', False — хибні; все інше — істинне</li>
+      <li>Тернарний оператор: <span class="inline-code">значення_if_true if умова else значення_if_false</span></li>
+      <li>and — обидві умови True</li>
+      <li>or — хоча б одна True</li>
+      <li>not — заперечення</li>
+      <li>Пріоритет: not → and → or (дужки для зрозумілості)</li>
+    </ul>
+  </div>
+</section>
+
+<div id="extra"></div>
+
+<!-- PHASE 9 -->
+<section class="phase" data-phase>
+  <div class="phase-header" data-toggle>
+    <span class="phase-num">09</span>
+    <h3>Додаткові завдання</h3>
+    <span class="chev">▸</span>
+  </div>
+  <div class="phase-body">
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">1</span><span class="task-title">Високосний рік</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Рік є високосним якщо він складається з 366 днів (а не 365). Рік є високосним якщо: ділиться на 4, але не на 100 — або ділиться на 400. Напиши програму, яка запитує рік і виводить leap year або not a leap year.</div>
+      <button class="reveal-btn" data-reveal="rv-a1"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-a1"><div class="code-block" id="cb-a1"></div><p class="reveal-tip">💡 Перевіряємо від загального до конкретного: спочатку % 4, потім % 100, потім % 400. Другий варіант (вкладка «бонус») — коротший запис через and/or.</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">2</span><span class="task-title">Дивне число</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Дано ціле число n. Якщо n непарне → виведи Weird. Якщо n парне і в діапазоні [2, 5] → виведи Not Weird. Якщо n парне і в діапазоні [6, 20] → виведи Weird. Якщо n парне і більше 20 → виведи Not Weird.</div>
+      <button class="reveal-btn" data-reveal="rv-a2"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-a2"><div class="code-block" id="cb-a2"></div><p class="reveal-tip">💡 Спочатку відсіюємо непарні, потім для парних перевіряємо діапазон</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">3</span><span class="task-title">FizzBuzz</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Дано число n. Виведи: FizzBuzz — якщо ділиться і на 3, і на 5; Fizz — якщо ділиться тільки на 3; Buzz — якщо ділиться тільки на 5; саме число — якщо не ділиться ні на 3, ні на 5. Увага: найспецифічнішу умову (і 3, і 5) перевіряємо ПЕРШОЮ!</div>
+      <button class="reveal-btn" data-reveal="rv-a3"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-a3"><div class="code-block" id="cb-a3"></div><p class="reveal-tip">💡 Якщо поставити FizzBuzz після Fizz/Buzz — воно ніколи не спрацює, бо elif вже зупиниться раніше</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">5</span><span class="task-title">Класифікатор оцінок (100-бальна шкала)</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Прийми оцінку (0–100) і виведи літерну оцінку: 90–100 → A, 80–89 → B, 70–79 → C, 60–69 → D, нижче 60 → F. Якщо введено число не в діапазоні 0–100 → виведи повідомлення про помилку.</div>
+      <button class="reveal-btn" data-reveal="rv-a5"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-a5"><div class="code-block" id="cb-a5"></div><p class="reveal-tip">💡 Перевіряємо від найвищого до найнижчого — кожен elif спрацьовує тільки якщо попередні не спрацювали</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">6</span><span class="task-title">Текстовий квест</span><span class="task-stars">⭐⭐⭐</span></div>
+      <div class="task-body">Створи коротку текстову пригоду. Гравець робить вибір у різних точках, а вкладені if-else визначають результат. Мінімум 3 рівні вибору, 2+ кінцівки. Використай if/elif/else або match/case.</div>
+      <button class="reveal-btn" data-reveal="rv-a6"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-a6"><div class="code-block" id="cb-a6"></div><p class="reveal-tip">💡 Кожен рівень — це новий вкладений if. Завжди додавай else для некоректного вводу</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">7</span><span class="task-title">Відпустка програміста</span><span class="task-stars">⭐⭐⭐</span></div>
+      <div class="task-body">Програма приймає бюджет і сезон, виводить місце відпустки і суму витрат. До 100$ → Болгарія: літо — 30%, зима — 70% бюджету. До 1000$ → Балкани: літо — 40%, зима — 80% бюджету. Більше 1000$ → Європа: завжди готель, 90% бюджету.</div>
+      <button class="reveal-btn" data-reveal="rv-a7"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-a7"><div class="code-block" id="cb-a7"></div><p class="reveal-tip">💡 В Європі сезон не впливає — вкладений if не потрібен</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">8</span><span class="task-title">Калькулятор ІМТ</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Запитай вагу (кг) і зріст (м). Обчисли ІМТ = вага / (зріст²). Виведи категорію: &lt;18.5 → Недостатня вага, 18.5–24.9 → Нормальна вага, 25–29.9 → Надлишкова вага, 30 і більше → Ожиріння.</div>
+      <button class="reveal-btn" data-reveal="rv-a8"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-a8"><div class="code-block" id="cb-a8"></div><p class="reveal-tip">💡 height ** 2 — зріст у квадраті. :.1f — виводимо з одним знаком після коми</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">9</span><span class="task-title">Час доби</span><span class="task-stars">⭐</span></div>
+      <div class="task-body">Запитай годину (0–23). Виведи частину доби: 6–11 → Доброго ранку!, 12–17 → Добрий день!, 18–21 → Добрий вечір!, 22–23 або 0–5 → Добраніч! Якщо введено число не в діапазоні 0–23 → повідомлення про помилку.</div>
+      <button class="reveal-btn" data-reveal="rv-a9"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-a9"><div class="code-block" id="cb-a9"></div><p class="reveal-tip">💡 else в кінці охоплює і нічні години після 22, і ранні до 6 — не потрібно писати дві умови</p></div>
+    </div>
+    <div class="task-card">
+      <div class="task-head"><span class="task-badge">10</span><span class="task-title">Ціна квитка на атракціон</span><span class="task-stars">⭐⭐</span></div>
+      <div class="task-body">Базова ціна квитка — 200 грн. Вік &lt;5 або &gt;70 → безкоштовно. Вік 5–12 → знижка 50%. Вік 13–17 або &gt;60 → знижка 25%. Якщо є пільгове посвідчення → додаткова знижка 10% (від вже зниженої ціни).</div>
+      <button class="reveal-btn" data-reveal="rv-a10"><span class="chev">▸</span> Перевір себе</button>
+      <div class="reveal-content" id="rv-a10"><div class="code-block" id="cb-a10"></div><p class="reveal-tip">💡 Знижку за посвідчення рахуємо окремим if після основного — щоб вона застосувалась до вже зниженої ціни</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>Python · Розгалуження — Урок 2 · сендбокси виконуються через Pyodide прямо в браузері</footer>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v314.0.2/full/pyodide.js"></script>
+<script>
+const CODE_BLOCKS = {
+  "cb-truthvalue": [
+    { name: "9_truth_value_testing.py", input:true, code:
+`string = input('Enter a string: ')
+# Те ж саме, що if string is not None and string != ''
+
+if string:
+    print('The string is {}'.format(string))
+
+number = int(input('Enter a number: '))
+
+if number:
+    print('Число не дорівнює нулю')
+# Якщо ввести 0:
+else:
+    print('Число дорівнює нулю')` },
+    { name: "11_if_simplified.py", input:true, code:
+`string = input("Введіть рядок: ")
+
+if string is not None and string != '':
+    num = int(string)
+
+if string:
+    num = int(string)
+
+print(num)` }
+  ],
+
+  "cb-ternary": [
+    { name: "7_no_conditional_expression.py", input:false, code:
+`is_ready = True
+
+# Привласнюємо значення змінної залежно від умови
+if is_ready:
+    state_msg = 'Ready'
+else:
+    state_msg = 'Not ready yet'
+
+print(state_msg)` },
+    { name: "8_conditional_expression.py", input:false, code:
+`is_ready = True
+
+# Те саме, що й у попередньому прикладі, але використовуємо умовний вираз замість умовного оператора
+state_msg = 'Ready' if is_ready else 'Not ready yet'
+print(state_msg)` },
+    { name: "12_ternary.py", input:true, code:
+`# Проста умова
+number = int(input("Input your digit: "))
+if number >= 0:
+    print(number)
+else:
+    print(-number)
+# Тернарний оператор
+print(number if number >= 0 else -number)
+
+result = 5 if 4 > 3 else 0  # ternary operator; equals to 5
+print(result)
+result2 = 5 if 3 > 4 else 0  # ternary operator; equals to 0
+print(result2)` },
+    { name: "13_ternary.py", input:false, code:
+`value_str = "hello"
+result = None if not value_str else value_str
+print(result)
+another_way = value_str if value_str else None
+print(another_way)` },
+    { name: "ще_приклади.py", input:true, code:
+`number = int(input('Введи число: '))
+# Вивести модуль числа:
+print(number if number >= 0 else -number)
+# Перевірка парності:
+result = 'парне' if number % 2 == 0 else 'непарне'
+print(result)
+# Максимум двох чисел:
+a, b = 10, 20
+maximum = a if a > b else b
+print(maximum)` }
+  ],
+
+  "cb-and": [{ name: "and.py", input:true, code:
+`age = int(input('Вік: '))
+has_ticket = input('Є квиток? (так/ні): ')
+
+if age >= 18 and has_ticket == 'так':
+    print('Вхід дозволено')
+else:
+    print('Вхід заборонено')` }],
+
+  "cb-or": [{ name: "or.py", input:true, code:
+`day = input('День тижня: ')
+
+if day == 'субота' or day == 'неділя':
+    print('Вихідний!')
+else:
+    print('Робочий день')` }],
+
+  "cb-not": [{ name: "not.py", input:false, code:
+`is_banned = False
+
+if not is_banned:
+    print('Ласкаво просимо!')
+
+# not перетворює True на False і навпаки
+print(not True)   # False
+print(not False)  # True
+print(not 0)      # True
+print(not 'hi')   # False` }],
+
+  "cb-p1": [{ name: "рішення", input:true, code:
+`name = input("Введи ім'я: ")
+
+if name:
+    print("Привіт,", name + "!")
+else:
+    print("Ім'я не вказано")` }],
+
+  "cb-p2": [{ name: "рішення", input:true, code:
+`score = int(input("Введи оцінку: "))
+
+if score:
+    print("Оцінка є:", score)
+else:
+    print("Оцінка відсутня")` }],
+
+  "cb-p3": [{ name: "рішення", input:true, code:
+`number = int(input("Введи число: "))
+result = number if number >= 0 else -number
+print("Модуль:", result)
+
+# Або одразу в print:
+print("Модуль:", number if number >= 0 else -number)` }],
+
+  "cb-p4": [{ name: "рішення", input:true, code:
+`a = int(input("a = "))
+b = int(input("b = "))
+
+result = "a більше" if a > b else ("b більше" if b > a else "рівні")
+print(result)` }],
+
+  "cb-p5": [{ name: "рішення", input:true, code:
+`number = int(input("Введи число: "))
+print("парне" if number % 2 == 0 else "непарне")` }],
+
+  "cb-p6": [{ name: "рішення", input:true, code:
+`correct_login = "admin"
+correct_password = "1234"
+
+login = input("Логін: ")
+password = input("Пароль: ")
+
+if login == correct_login and password == correct_password:
+    print("Вхід успішний!")
+else:
+    print("Невірні дані")` }],
+
+  "cb-p7": [{ name: "рішення", input:true, code:
+`day = input("День тижня: ").lower()
+
+if day == "субота" or day == "неділя":
+    print("Вихідний, відпочиваємо!")
+else:
+    print("Робочий день, до справ!")
+
+# Або через оператор in (бонус):
+if day in ("субота", "неділя"):
+    print("Вихідний!")` }],
+
+  "cb-p8": [{ name: "рішення", input:true, code:
+`attendance = int(input("Відвідувань (з 10): "))
+grade = int(input("Середній бал (1-12): "))
+
+if attendance >= 7 and grade >= 4:
+    print("Допущено до іспиту ✓")
+else:
+    print("Не допущено до іспиту ✗")
+
+if attendance < 7:
+    print("Причина: мало відвідувань")
+if grade < 4:
+    print("Причина: низький бал")` }],
+
+  "cb-p9": [{ name: "рішення", input:true, code:
+`price = 500
+age = int(input("Вік: "))
+has_card = input("Є студентський? (так/ні): ").lower()
+
+if age > 60:
+    discount = 0.30
+elif age < 18 or has_card == "так":
+    discount = 0.20
+else:
+    discount = 0
+
+final_price = price * (1 - discount)
+print(f"Знижка: {int(discount * 100)}%")
+print(f"До сплати: {final_price} грн")` }],
+
+  "cb-p10": [{ name: "рішення", input:true, code:
+`score = int(input("Оцінка (1-12): "))
+
+if score >= 10 and score <= 12:
+    print("Відмінно")
+elif score >= 7 and score <= 9:
+    print("Добре")
+elif score >= 4 and score <= 6:
+    print("Задовільно")
+elif score >= 1 and score <= 3:
+    print("Незадовільно")
+else:
+    print("Некоректна оцінка")
+
+# Бонус — коротший запис (Python дозволяє):
+# if 10 <= score <= 12:
+#     print("Відмінно")` }],
+
+  "cb-p11": [{ name: "рішення", input:true, code:
+`score = 0
+
+# Питання 1
+answer = input("Яка столиця України? (а-Київ, б-Львів, в-Харків): ").lower()
+if answer == "а":
+    score += 1
+    print("Правильно!")
+else:
+    print("Неправильно. Правильна відповідь: а")
+
+# Питання 2
+answer = input("Скільки місяців у році? (а-10, б-12, в-14): ").lower()
+if answer == "б":
+    score += 1
+    print("Правильно!")
+else:
+    print("Неправильно. Правильна відповідь: б")
+
+# Питання 3
+answer = input("2 + 2 = ? (а-3, б-5, в-4): ").lower()
+if answer == "в":
+    score += 1
+    print("Правильно!")
+else:
+    print("Неправильно. Правильна відповідь: в")
+
+# Результат з тернарним оператором:
+print(f"\\nРезультат: {score}/3")
+if score == 3:
+    result = "Відмінно!"
+elif score == 2:
+    result = "Добре!"
+else:
+    result = "Спробуй ще" if score == 1 else "Готуйся краще"
+print(result)` }],
+
+  "cb-p12": [{ name: "рішення", input:true, code:
+`print("Меню:")
+print("1 - Додавання")
+print("2 - Віднімання")
+print("3 - Множення")
+print("4 - Ділення")
+
+a_str = input("Перше число: ")
+b_str = input("Друге число: ")
+
+# Truth value — перевіряємо чи не порожній рядок
+if not a_str or not b_str:
+    print("Помилка вводу: число не введено")
+else:
+    a = int(a_str)
+    b = int(b_str)
+    choice = int(input("Вибір (1-4): "))
+    if choice == 1:
+        print("Результат:", a + b)
+    elif choice == 2:
+        print("Результат:", a - b)
+    elif choice == 3:
+        print("Результат:", a * b)
+    elif choice == 4:
+        print("Результат:", a / b if b != 0 else "Помилка: ділення на нуль")
+    else:
+        print("Некоректний вибір")` }],
+
+  "cb-hw1": [{ name: "рішення", input:true, code:
+`total = float(input("Сума покупки (грн): "))
+has_card = input("Є картка лояльності? (так/ні): ").lower()
+
+big_purchase = total > 1000
+loyalty_card = has_card == "так"
+
+if big_purchase and loyalty_card:
+    discount = 0.15
+elif big_purchase:
+    discount = 0.10
+elif loyalty_card:
+    discount = 0.05
+else:
+    discount = 0
+
+final = total * (1 - discount)
+msg = f"Знижка {int(discount*100)}%! До сплати: {final:.2f} грн"
+print(msg if discount > 0 else f"Знижки немає. До сплати: {final:.2f} грн")` }],
+
+  "cb-hw2": [{ name: "рішення", input:true, code:
+`age = int(input("Вік: "))
+has_passport = input("Є паспорт? (так/ні): ").lower() == "так"
+is_vip = input("Є VIP-запрошення? (так/ні): ").lower() == "так"
+
+# VIP проходить без умов, або вік >= 18 AND паспорт:
+if is_vip or (age >= 18 and has_passport):
+    print("Заходьте!")
+else:
+    print("Вхід заборонено")
+
+if age < 18:
+    print("Причина: не досяг 18 років")
+elif not has_passport:
+    print("Причина: немає паспорту")` }],
+
+  "cb-a1": [
+    { name: "вкладені if", input:true, code:
+`year = int(input("Введи рік: "))
+
+if year % 4 == 0:
+    if year % 100 == 0:
+        if year % 400 == 0:
+            print("leap year")           # ділиться на 400 → високосний
+        else:
+            print("not a leap year")     # ділиться на 100, але не на 400
+    else:
+        print("leap year")               # ділиться на 4, але не на 100
+else:
+    print("not a leap year")             # не ділиться на 4` },
+    { name: "бонус: коротший", input:true, code:
+`year = int(input("Введи рік: "))
+
+if (year % 4 == 0 and year % 100 != 0) or year % 400 == 0:
+    print("leap year")
+else:
+    print("not a leap year")` }
+  ],
+
+  "cb-a2": [{ name: "рішення", input:true, code:
+`n = int(input("Введи число: "))
+
+if n % 2 != 0:
+    print("Weird")               # непарне — завжди Weird
+else:
+    if 2 <= n <= 5:
+        print("Not Weird")
+    elif 6 <= n <= 20:
+        print("Weird")
+    else:                        # n > 20
+        print("Not Weird")` }],
+
+  "cb-a3": [{ name: "рішення", input:true, code:
+`n = int(input("Введи число: "))
+
+if n % 3 == 0 and n % 5 == 0:    # найспецифічніше — першим!
+    print("FizzBuzz")
+elif n % 3 == 0:
+    print("Fizz")
+elif n % 5 == 0:
+    print("Buzz")
+else:
+    print(n)` }],
+
+  "cb-a5": [{ name: "рішення", input:true, code:
+`mark = int(input("Введи оцінку (0-100): "))
+
+if mark < 0 or mark > 100:
+    print("Помилка: оцінка має бути від 0 до 100")
+elif mark >= 90:
+    print("Оцінка: A")
+elif mark >= 80:
+    print("Оцінка: B")
+elif mark >= 70:
+    print("Оцінка: C")
+elif mark >= 60:
+    print("Оцінка: D")
+else:
+    print("Оцінка: F")` }],
+
+  "cb-a6": [{ name: "рішення", input:true, code:
+`print("=== ПРИГОДА В ПІДЗЕМЕЛЛІ ===")
+print("Ти стоїш перед розвилкою. Є двері ліворуч і праворуч.")
+print()
+
+choice1 = input("Куди йдеш? (ліво/право): ").lower()
+
+if choice1 == "ліво":
+    print("\\nТи заходиш у темну кімнату. Бачиш скриню і смолоскип.")
+    choice2 = input("Що робиш? (скриня/смолоскип): ").lower()
+    if choice2 == "скриня":
+        print("\\nВідкриваєш скриню — там 100 золотих монет!")
+        choice3 = input("Береш монети? (так/ні): ").lower()
+        if choice3 == "так":
+            print("\\nТи виходиш багатим переможцем! ПЕРЕМОГА!")
+        else:
+            print("\\nТи залишаєш монети і йдеш далі… нічого не знайшов.")
+    elif choice2 == "смолоскип":
+        print("\\nБереш смолоскип — кімната освітлюється.")
+        print("Бачиш таємний прохід!")
+        print("\\nЗнаходиш вихід з підземелля. ПЕРЕМОГА!")
+    else:
+        print("\\nНічого не робиш і залишаєшся в темряві…")
+elif choice1 == "право":
+    print("\\nТи заходиш у кімнату. Там спить дракон!")
+    choice2 = input("Що робиш? (тікати/битись/сховатись): ").lower()
+    if choice2 == "тікати":
+        print("\\nТи тікаєш! Дракон прокидається, але не встигає…")
+        print("Ти врятувався! ПЕРЕМОГА!")
+    elif choice2 == "битись":
+        print("\\nДракон прокидається і перемагає тебе. ПОРАЗКА.")
+    elif choice2 == "сховатись":
+        print("\\nТи ховаєшся за каменем. Дракон не помічає тебе.")
+        print("Знаходиш скарб поруч!")
+        print("ПЕРЕМОГА зі скарбом!")
+    else:
+        print("\\nТи розгублений… дракон прокидається.")
+        print("ПОРАЗКА.")
+else:
+    print("Незрозумілий вибір. Пригода закінчується.")` }],
+
+  "cb-a7": [{ name: "рішення", input:true, code:
+`budget = float(input("Бюджет (грн): "))
+season = input("Сезон (літо/зима): ").lower()
+
+if budget <= 100:
+    destination = "Болгарії"
+    if season == "літо":
+        vacation_type = "Табір"
+        spent = budget * 0.30
+    else:
+        vacation_type = "Готель"
+        spent = budget * 0.70
+elif budget <= 1000:
+    destination = "Балканах"
+    if season == "літо":
+        vacation_type = "Табір"
+        spent = budget * 0.40
+    else:
+        vacation_type = "Готель"
+        spent = budget * 0.80
+else:  # більше 1000
+    destination = "Європі"
+    vacation_type = "Готель"  # в Європі завжди готель
+    spent = budget * 0.90
+
+print(f"Десь у {destination}")
+print(f"{vacation_type} — {spent:.2f} грн")` }],
+
+  "cb-a8": [{ name: "рішення", input:true, code:
+`weight = float(input("Вага (кг): "))
+height = float(input("Зріст (м), наприклад 1.75: "))
+
+bmi = weight / (height ** 2)
+print(f"Твій ІМТ: {bmi:.1f}")
+
+if bmi < 18.5:
+    print("Категорія: Недостатня вага")
+elif bmi < 25:
+    print("Категорія: Нормальна вага")
+elif bmi < 30:
+    print("Категорія: Надлишкова вага")
+else:
+    print("Категорія: Ожиріння")` }],
+
+  "cb-a9": [{ name: "рішення", input:true, code:
+`hour = int(input("Введи годину (0-23): "))
+
+if hour < 0 or hour > 23:
+    print("Помилка: година має бути від 0 до 23")
+elif 6 <= hour <= 11:
+    print("Доброго ранку! 🌅")
+elif 12 <= hour <= 17:
+    print("Добрий день! ☀️")
+elif 18 <= hour <= 21:
+    print("Добрий вечір! 🌆")
+else:  # 22-23 або 0-5
+    print("Добраніч! 🌙")` }],
+
+    "cb-format": [{ name: "format_demo.py", input:false, code:
+`name = "Анна"
+age = 20
+
+# {} — порожні місця, .format() заповнює їх по черзі
+print('Мене звати {}, мені {} років'.format(name, age))
+
+# З номерами порядок можна міняти, а одне значення — використати двічі
+print('{0} + {1} = {2}'.format(5, 3, 5 + 3))
+print('{1} {0} {1}'.format('B', 'A'))
+
+# Те саме через f-рядок (коротше)
+print(f'Мене звати {name}, мені {age} років')
+
+# Рядок з файлу вище
+string = 'Python'
+print('The string is {}'.format(string))` }],
+
+  "cb-a10": [{ name: "рішення", input:true, code:
+`base_price = 200
+age = int(input("Вік: "))
+has_benefit = input("Є пільгове посвідчення? (так/ні): ").lower() == "так"
+
+if age < 5 or age > 70:
+    price = 0
+elif age <= 12:               # 5-12
+    price = base_price * 0.50
+elif age <= 17 or age > 60:   # 13-17 або 61-70
+    price = base_price * 0.75
+else:                         # 18-60
+    price = base_price
+
+# Додаткова знижка за посвідчення (якщо не безкоштовно)
+if has_benefit and price > 0:
+    price = price * 0.90
+
+print(f"Ціна квитка: {price:.2f} грн")` }]
+};
+
+let pyodideReadyPromise = null;
+function setStatus(state, text){
+  const el = document.getElementById('pyoStatus');
+  const t = document.getElementById('pyoStatusText');
+  el.classList.remove('ready','loading');
+  if(state) el.classList.add(state);
+  t.textContent = text;
+}
+function getPyodide(){
+  if(!pyodideReadyPromise){
+    setStatus('loading', 'Python-середовище: завантаження…');
+    pyodideReadyPromise = loadPyodide().then(async (pyodide) => {
+      pyodide.globals.set("_js_prompt", (msg) => {
+        const v = window.prompt(msg && msg.length ? msg : "Введіть значення:");
+        return v === null ? "" : v;
+      });
+      await pyodide.runPythonAsync(`
+import builtins
+def input(prompt=""):
+    val = _js_prompt(prompt)
+    print(str(prompt) + str(val))
+    return val
+builtins.input = input
+`);
+      setStatus('ready', 'Python-середовище: готове');
+      return pyodide;
+    }).catch((e) => {
+      setStatus('loading', 'Не вдалося завантажити Python-середовище');
+      throw e;
+    });
+  }
+  return pyodideReadyPromise;
+}
+function escapeHtml(str){
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+async function runSandbox(blockId, fileIndex, btn){
+  const output = document.getElementById(blockId + '-output-' + fileIndex);
+  const textarea = document.getElementById(blockId + '-code-' + fileIndex);
+  const code = textarea.value;
+  output.classList.add('visible');
+  output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>завантаження Python…';
+  btn.disabled = true;
+  try{
+    const pyodide = await getPyodide();
+    let buffer = [];
+    pyodide.setStdout({ batched: (s) => buffer.push(s) });
+    pyodide.setStderr({ batched: (s) => buffer.push(s) });
+    const globalsDict = pyodide.globals.get('dict')();
+    try{
+      await pyodide.runPythonAsync(code, { globals: globalsDict });
+    } catch(err){
+      buffer.push(String(err));
+    } finally {
+      globalsDict.destroy();
+      pyodide.setStdout({});
+      pyodide.setStderr({});
+    }
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>' + (buffer.length ? escapeHtml(buffer.join('\n')) : '(немає виводу)');
+  } catch(e){
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>Помилка запуску: ' + escapeHtml(String(e));
+  } finally {
+    btn.disabled = false;
+  }
+}
+function renderCodeBlock(blockId, files){
+  const container = document.getElementById(blockId);
+  if(!container || container.dataset.rendered) return;
+  container.dataset.rendered = "1";
+  const hasInput = files.some(f => f.input);
+  let tabsHtml = '';
+  if(files.length > 1){
+    tabsHtml = '<div class="cb-tabs">' + files.map((f,i) =>
+      `<div class="cb-tab${i===0?' active':''}" data-idx="${i}">${f.name}</div>`
+    ).join('') + '</div>';
+  } else {
+    tabsHtml = `<div class="cb-tabs"><div class="cb-label">${files[0].name}</div></div>`;
+  }
+  let editorsHtml = files.map((f,i) =>
+    `<textarea class="cb-editor" id="${blockId}-code-${i}" style="display:${i===0?'block':'none'}" spellcheck="false">${escapeHtml(f.code)}</textarea>`
+  ).join('');
+  let outputsHtml = files.map((f,i) => `<div class="cb-output" id="${blockId}-output-${i}"></div>`).join('');
+  container.innerHTML = tabsHtml + editorsHtml +
+    `<div class="cb-toolbar">
+      <button class="cb-run" id="${blockId}-run">▶ Запустити</button>
+      ${hasInput ? '<span class="cb-hint">💡 код запитує дані — браузер покаже віконце для введення</span>' : ''}
+    </div>` + outputsHtml;
+
+  let activeIdx = 0;
+  if(files.length > 1){
+    container.querySelectorAll('.cb-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const idx = parseInt(tab.dataset.idx, 10);
+        container.querySelectorAll('.cb-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        files.forEach((f,i) => {
+          document.getElementById(`${blockId}-code-${i}`).style.display = (i===idx) ? 'block' : 'none';
+          document.getElementById(`${blockId}-output-${i}`).classList.remove('visible');
+        });
+        activeIdx = idx;
+      });
+    });
+  }
+  document.getElementById(blockId + '-run').addEventListener('click', function(){
+    runSandbox(blockId, activeIdx, this);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-toggle]').forEach(header => {
+    header.addEventListener('click', () => {
+      const phase = header.closest('.phase');
+      const body = phase.querySelector('.phase-body');
+      const isOpen = phase.classList.contains('open');
+      if(isOpen){
+        body.style.maxHeight = body.scrollHeight + 'px';
+        requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
+        phase.classList.remove('open');
+      } else {
+        phase.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+        setTimeout(() => { if(phase.classList.contains('open')) body.style.maxHeight = 'none'; }, 360);
+      }
+    });
+  });
+
+  // theory sandboxes render immediately
+  ['cb-truthvalue','cb-format','cb-ternary','cb-and','cb-or','cb-not'].forEach(id => renderCodeBlock(id, CODE_BLOCKS[id]));
+  // task sandboxes render lazily, on first reveal
+  document.querySelectorAll('.reveal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.reveal);
+      const isOpen = target.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.innerHTML = (isOpen ? '<span class="chev">▸</span> Сховати відповідь' : '<span class="chev">▸</span> Перевір себе');
+      if(isOpen){
+        const cb = target.querySelector('.code-block');
+        if(cb && CODE_BLOCKS[cb.id]) renderCodeBlock(cb.id, CODE_BLOCKS[cb.id]);
+      }
+    });
+  });
+
+  const firstPhase = document.querySelector('.phase');
+  if(firstPhase){
+    firstPhase.classList.add('open');
+    firstPhase.querySelector('.phase-body').style.maxHeight = 'none';
+  }
+});
+</script>
+</body>
+</html>
