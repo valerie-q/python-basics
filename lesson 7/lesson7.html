@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python · Розгалуження — Урок 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F5; --panel:#FFFFFF; --ink:#17151A; --ink-soft:#5B584F; --ink-faint:#918D82;
+    --red:#C81E1E; --red-deep:#8C1410; --red-wash:#FBEAE9; --rule:#E6E2D8; --code-bg:#F4F2EC;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'IBM Plex Sans', -apple-system, sans-serif;
+    --display:'Manrope', var(--sans);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.6; font-size:16px; -webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--red); color:#fff;}
+
+  header.hero{padding:56px 24px 32px; max-width:880px; margin:0 auto; border-bottom:1px solid var(--rule);}
+  .eyebrow{font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--red); font-weight:700; display:flex; align-items:center; gap:8px;}
+  .eyebrow::before{content:"›_"; color:var(--red);}
+  h1.title{font-family:var(--display); font-weight:800; font-size:clamp(1.8rem,4vw,2.6rem); margin:10px 0 6px; letter-spacing:-0.01em;}
+  .subtitle{color:var(--ink-soft); font-size:1.02rem; max-width:60ch;}
+  .pyostatus{margin-top:18px; display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:.8rem; color:var(--ink-soft); border:1px solid var(--rule); background:var(--panel); padding:6px 12px; border-radius:999px;}
+  .pyostatus .dot{width:8px; height:8px; border-radius:50%; background:var(--ink-faint); transition:background .3s;}
+  .pyostatus.ready .dot{background:#2E8B57;}
+  .pyostatus.loading .dot{background:var(--red); animation:blink 1s infinite;}
+  @keyframes blink{50%{opacity:.25;}}
+
+  nav.daynav{position:sticky; top:0; z-index:20; background:rgba(250,249,245,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--rule); padding:10px 24px;}
+  nav.daynav .wrap{max-width:880px; margin:0 auto; display:flex; gap:8px; flex-wrap:wrap;}
+  nav.daynav a{font-family:var(--mono); font-size:.78rem; text-decoration:none; color:var(--ink-soft); border:1px solid var(--rule); padding:5px 12px; border-radius:999px; background:var(--panel); transition:.15s;}
+  nav.daynav a:hover{border-color:var(--red); color:var(--red-deep);}
+
+  main{max-width:880px; margin:0 auto; padding:8px 24px 100px;}
+
+  .phase{background:var(--panel); border:1px solid var(--rule); border-radius:14px; margin:18px 0; overflow:hidden;}
+  .phase-header{display:flex; align-items:center; gap:14px; padding:16px 20px; cursor:pointer; user-select:none;}
+  .phase-header .phase-num{font-family:var(--mono); color:var(--red); font-weight:700; font-size:.85rem; flex:0 0 auto;}
+  .phase-header h3{font-family:var(--display); font-weight:700; font-size:1.08rem; margin:0; flex:1;}
+  .phase-header .chev{font-family:var(--mono); color:var(--ink-faint); transition:transform .25s; font-size:.9rem;}
+  .phase.open .phase-header .chev{transform:rotate(90deg); color:var(--red);}
+  .phase-body{max-height:0; overflow:hidden; transition:max-height .35s ease; padding:0 22px;}
+  .phase.open .phase-body{padding:0 22px 22px;}
+  .phase-body > *:first-child{margin-top:0;}
+
+  h4.sub{font-family:var(--display); font-weight:700; font-size:1rem; margin:22px 0 8px; color:var(--ink);}
+  p{margin:10px 0;}
+  ul, ol{padding-left:1.3em;}
+  li{margin:5px 0;}
+  code.inline, .inline-code{font-family:var(--mono); background:var(--code-bg); padding:1px 6px; border-radius:5px; font-size:.9em;}
+  strong{color:var(--ink);}
+  pre.static{margin:10px 0; padding:14px 18px; background:var(--code-bg); border:1px solid var(--rule); border-radius:10px; font-family:var(--mono); font-size:.85rem; white-space:pre; overflow-x:auto;}
+
+  blockquote.callout{border-left:3px solid var(--red); background:var(--red-wash); margin:14px 0; padding:12px 16px; border-radius:0 10px 10px 0; font-size:.95rem;}
+  blockquote.callout.warn{border-left-color:var(--ink-faint); background:var(--code-bg);}
+  .callout ul{margin:6px 0 0;}
+
+  table.reftable{width:100%; border-collapse:collapse; margin:16px 0; font-size:.92rem;}
+  table.reftable th{background:var(--red); color:#fff; text-align:left; padding:9px 12px; font-family:var(--display); font-weight:700; font-size:.85rem;}
+  table.reftable td{padding:8px 12px; border-bottom:1px solid var(--rule);}
+  table.reftable td:first-child{font-family:var(--mono); white-space:nowrap; color:var(--red-deep);}
+  table.reftable tr:nth-child(even){background:var(--code-bg);}
+
+  .code-block{margin:16px 0; border:1px solid var(--rule); border-radius:12px; overflow:hidden; background:var(--panel);}
+  .cb-tabs{display:flex; background:var(--code-bg); border-bottom:1px solid var(--rule); overflow-x:auto;}
+  .cb-tab{font-family:var(--mono); font-size:.8rem; padding:9px 16px; cursor:pointer; white-space:nowrap; color:var(--ink-soft); border-right:1px solid var(--rule); background:transparent; border-top:2px solid transparent;}
+  .cb-tab.active{background:var(--panel); color:var(--ink); border-top:2px solid var(--red); font-weight:600;}
+  .cb-label{font-family:var(--mono); font-size:.75rem; color:var(--ink-faint); padding:9px 14px; border-right:1px solid var(--rule);}
+  .cb-editor{width:100%; border:none; resize:vertical; background:var(--code-bg); color:var(--ink); font-family:var(--mono); font-size:.87rem; line-height:1.55; padding:16px 18px; min-height:60px; display:block; tab-size:4;}
+  .cb-editor:focus{outline:none; background:#F8F6F0;}
+  .cb-toolbar{display:flex; align-items:center; gap:12px; padding:10px 16px; border-top:1px solid var(--rule);}
+  .cb-run{font-family:var(--mono); font-size:.82rem; font-weight:700; color:#fff; background:var(--red); border:none; border-radius:8px; padding:8px 18px; cursor:pointer; display:flex; align-items:center; gap:7px; transition:.15s;}
+  .cb-run:hover{background:var(--red-deep);}
+  .cb-run:disabled{background:var(--ink-faint); cursor:wait;}
+  .cb-hint{font-family:var(--mono); font-size:.74rem; color:var(--ink-faint);}
+  .cb-output{display:none; border-top:1px dashed var(--rule); padding:14px 18px; background:#FFFFFF; font-family:var(--mono); font-size:.85rem; white-space:pre-wrap; word-break:break-word;}
+  .cb-output.visible{display:block;}
+  .cb-output .tag{color:var(--red); font-weight:700; margin-right:4px;}
+
+  .task-card{border-left:4px solid var(--red); background:var(--panel); border-radius:0 12px 12px 0; padding:16px 20px; margin:16px 0; border-top:1px solid var(--rule); border-right:1px solid var(--rule); border-bottom:1px solid var(--rule);}
+  .task-card .task-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .task-badge{font-family:var(--mono); font-weight:700; font-size:.78rem; color:#fff; background:var(--red); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .task-title{font-family:var(--display); font-weight:700; font-size:1rem;}
+  .task-stars{font-size:.78rem; color:var(--red); margin-left:auto; font-family:var(--mono);}
+  .task-body{color:var(--ink); font-size:.96rem;}
+
+  .reveal-btn{margin-top:12px; font-family:var(--mono); font-size:.8rem; color:var(--red-deep); background:var(--red-wash); border:1px solid #EFC9C7; border-radius:8px; padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .reveal-btn:hover{background:#F6DAD8;}
+  .reveal-btn.open .chev{transform:rotate(90deg);}
+  .reveal-btn .chev{transition:transform .2s; display:inline-block;}
+  .reveal-content{display:none; margin-top:10px;}
+  .reveal-content.open{display:block;}
+  .reveal-tip{font-size:.85rem; color:var(--ink-soft); font-style:italic; margin:8px 0 0;}
+
+  footer{max-width:880px; margin:60px auto 40px; padding:0 24px; color:var(--ink-faint); font-size:.85rem; font-family:var(--mono); border-top:1px solid var(--rule); padding-top:20px;}
+
+  @media (max-width:600px){ header.hero{padding:40px 16px 24px;} main{padding:8px 16px 80px;} .cb-editor{font-size:.8rem;} }
+  .btn-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
+  .btn-row .reveal-btn{margin-top:0;}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">python · розгалуження · урок 3</div>
+  <h1 class="title">match/case + фінальна практика</h1>
+  <p class="subtitle">Нова конструкція Python 3.10+ замість довгих if/elif, guard-умови, шаблони зі списками — і 6 завдань та 3 міні-проєкти на вибір.</p>
+  <div class="pyostatus" id="pyoStatus"><span class="dot"></span><span id="pyoStatusText">Python-середовище: очікує запуску</span></div>
+</header>
+<nav class="daynav"><div class="wrap"><a href="#theory">Теорія</a><a href="#practice">Практика</a><a href="#projects">Міні-проєкти</a></div></nav>
+<main>
+<div id="theory"></div>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">01</span><h3>Що таке match/case</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<p><strong>match/case</strong> — нова конструкція Python 3.10+, яка замінює довгі ланцюжки <code class="inline">if/elif/else</code>, коли потрібно порівнювати <em>одну змінну</em> з багатьма значеннями.</p>
+<h4 class="sub">Синтаксис</h4>
+<pre class="static">match змінна:
+    case значення_1:
+        # дії якщо змінна == значення_1
+    case значення_2:
+        # дії якщо змінна == значення_2
+    case _:           # _ — це default, виконується якщо нічого не збіглось
+        # дії за замовчуванням</pre>
+<blockquote class="callout warn"><strong>⚠️ Тільки Python 3.10+</strong> — на старіших версіях match/case не працює!</blockquote>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">02</span><h3>if/elif vs match/case</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<p>Ці два варіанти роблять одне і те саме. Перемикай вкладки й запускай обидва:</p>
+<div class="code-block" id="cb-cmp"></div>
+<blockquote class="callout"><strong>Ключові відмінності match/case від if/elif:</strong>
+<ul>
+<li><span class="inline-code">|</span> замість <span class="inline-code">or</span> — для кількох значень в одному case</li>
+<li><span class="inline-code">case _</span> — замість <span class="inline-code">else</span> (default, якщо нічого не збіглось)</li>
+<li>Немає and/or для складних умов — для цього краще if</li>
+<li><strong>Тільки Python 3.10+</strong></li>
+</ul></blockquote>
+<p>Ще один приклад (файл 14) — повний тиждень, спочатку через if/elif, потім через match:</p>
+<div class="code-block" id="cb-f14"></div>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">03</span><h3>Коли що використовувати</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<table class="reftable"><tr><th>✅ match/case — коли:</th><th>✅ if — коли:</th></tr>
+<tr><td style="font-family:inherit;white-space:normal;color:inherit">порівнюємо одну змінну</td><td>складні умови (and/or/not)</td></tr>
+<tr><td style="font-family:inherit;white-space:normal;color:inherit">з конкретними значеннями</td><td>діапазони (&gt; &lt; &gt;=)</td></tr>
+<tr><td style="font-family:inherit;white-space:normal;color:inherit">багато варіантів (3+)</td><td>порівнюємо кілька змінних</td></tr>
+<tr><td style="font-family:inherit;white-space:normal;color:inherit">значення — рядки або числа</td><td>тернарний оператор</td></tr></table>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">04</span><h3>Бонус: match зі списком</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<p>match/case вміє розпізнавати й <strong>структуру даних</strong> — наприклад, список з різною кількістю елементів:</p>
+<div class="code-block" id="cb-bonus"></div>
+<blockquote class="callout">💡 <span class="inline-code">case [name, age]:</span> спрацьовує тільки якщо введено рівно 2 слова</blockquote>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">05</span><h3>Практика</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<div id="practice"></div>
+<h4 class="sub">⭐ Рівень 1</h4>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">1</span><span class="task-title">Знак числа</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Запитай число. Використай match/case, щоб вивести:<ul><li>число &gt; 0 → «Додатнє»</li><li>число &lt; 0 → «Від'ємне»</li><li>число == 0 → «Нуль»</li></ul></div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="hn-1" data-label-open="Сховати підказку" data-label-closed="💡 Підказка"><span class="chev">▸</span> 💡 Підказка</button> <button class="reveal-btn" data-reveal="rv-1" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="hn-1"><blockquote class="callout">match/case не вміє порівнювати діапазони — використай <code class="inline">if</code> для визначення знаку, а потім <code class="inline">match</code> для виводу повідомлення.<br>Або спробуй match з guard (<code class="inline">if</code> після <code class="inline">case</code>).</blockquote></div>
+ <div class="reveal-content" id="rv-1"><div class="code-block" id="cb-s1"></div><p class="reveal-tip">💡 <code class="inline">case n if n &gt; 0:</code> — це guard (охоронець), дозволяє додати умову всередині case</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">2</span><span class="task-title">Повний тиждень</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Запитай день тижня. Виведи повідомлення для кожного дня.<br>Суботу та неділю об'єднай в одному case через <code class="inline">|</code>.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-2" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-2"><div class="code-block" id="cb-s2"></div><p class="reveal-tip">💡 <code class="inline">|</code> замість <code class="inline">or</code> — тільки в match/case. У звичайному if треба писати <code class="inline">or</code></p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">3</span><span class="task-title">Калькулятор на match/case</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Запитай два числа і операцію (+, -, *, /). Виконай відповідну дію.<br>Перевірку ділення на нуль також зроби через match або if.<br>Для невідомої операції — виведи повідомлення про помилку.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-3" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-3"><div class="code-block" id="cb-s3"></div><p class="reveal-tip">💡 Всередині case можна використовувати звичайний if — вони чудово поєднуються</p></div>
+</div>
+<h4 class="sub">⭐⭐ Рівень 2</h4>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">4</span><span class="task-title">Квадратне рівняння</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Розв'яжи квадратне рівняння ax² + bx + c = 0.<br>Запитай a, b, c. Обчисли дискримінант D = b² − 4ac.<ul><li>D &gt; 0 → два корені: x1 = (−b + √D) / 2a, x2 = (−b − √D) / 2a</li><li>D == 0 → один корінь: x = −b / 2a</li><li>D &lt; 0 → дійсних коренів немає</li></ul>Використай <code class="inline">import math</code> для <code class="inline">math.sqrt()</code>. Результат match застосуй для виводу.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="hn-4" data-label-open="Сховати підказку" data-label-closed="💡 Підказка"><span class="chev">▸</span> 💡 Підказка</button> <button class="reveal-btn" data-reveal="rv-4" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="hn-4"><blockquote class="callout"><code class="inline">math.sqrt()</code> — квадратний корінь. <code class="inline">:.2f</code> — округлення до 2 знаків після коми.</blockquote></div>
+ <div class="reveal-content" id="rv-4"><div class="code-block" id="cb-s4"></div><p class="reveal-tip">💡 <code class="inline">math.sqrt()</code> — квадратний корінь. <code class="inline">:.2f</code> — округлення до 2 знаків після коми</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">5</span><span class="task-title">Класифікатор трикутника</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Запитай три сторони трикутника (a, b, c).<br>Спочатку перевір, чи це взагалі трикутник (сума двох сторін &gt; третьої). Потім визнач вид:<ul><li>всі три сторони рівні → рівносторонній</li><li>рівно дві сторони рівні → рівнобедрений</li><li>всі різні → різносторонній</li></ul>Бонус: перевір також, чи він прямокутний (a² + b² == c²).</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="hn-5" data-label-open="Сховати підказку" data-label-closed="💡 Підказка"><span class="chev">▸</span> 💡 Підказка</button> <button class="reveal-btn" data-reveal="rv-5" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="hn-5"><blockquote class="callout"><code class="inline">sorted()</code> сортує список — найменші сторони перші, найбільша остання (гіпотенуза).</blockquote></div>
+ <div class="reveal-content" id="rv-5"><div class="code-block" id="cb-s5"></div><p class="reveal-tip">💡 <code class="inline">sorted()</code> сортує список — найменші сторони перші, найбільша остання (гіпотенуза)</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">6</span><span class="task-title">Сезон року</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Запитай місяць (число від 1 до 12). Виведи пору року.<br>Об'єднай місяці одного сезону через <code class="inline">|</code> в одному case.<br>Додай перевірку: якщо введено число не від 1 до 12 → повідомлення про помилку.<br>Бонус: також виведи кількість днів у цьому місяці (враховуй лютий — 28 або 29).</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="hn-6" data-label-open="Сховати підказку" data-label-closed="💡 Підказка"><span class="chev">▸</span> 💡 Підказка</button> <button class="reveal-btn" data-reveal="rv-6" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="hn-6"><blockquote class="callout">Два match поспіль — перший для сезону, другий для кількості днів.</blockquote></div>
+ <div class="reveal-content" id="rv-6"><div class="code-block" id="cb-s6"></div><p class="reveal-tip">💡 Два match поспіль — перший для сезону, другий для кількості днів</p></div>
+</div>
+<h4 class="sub" id="projects">⭐⭐⭐ Рівень 3 — Міні-проєкт на вибір</h4>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">А</span><span class="task-title">🎮 Текстовий квест</span><span class="task-stars">⭐⭐⭐</span></div>
+ <div class="task-body">Розшир текстовий квест з додаткових завдань або створи новий.<p><strong>Вимоги:</strong></p><ul><li>мінімум 4 рівні вибору (глибина)</li><li>мінімум 3 різні кінцівки (перемога / поразка / секретна)</li><li>хоча б один match/case для вибору дії</li><li>підрахунок очок або здоров'я гравця</li><li>виведи підсумок в кінці</li></ul></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">Б</span><span class="task-title">🧮 Розумний калькулятор</span><span class="task-stars">⭐⭐⭐</span></div>
+ <div class="task-body">Створи повноцінний калькулятор з меню і перевірками.<p><strong>Вимоги:</strong></p><ul><li>меню з операціями через match/case (+ - * / % // **)</li><li>перевірка ділення на нуль</li><li>перевірка від'ємного числа для квадратного кореня (<code class="inline">import math</code>)</li><li>перевірка, що введено саме число (truth value)</li><li>виведи красиве меню на початку</li></ul></div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-Б" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-Б"><div class="code-block" id="cb-sB"></div><p class="reveal-tip">💡 <code class="inline">case '+' | '1':</code> — можна вводити або символ операції, або її номер з меню</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">В</span><span class="task-title">🧠 Вікторина-RPG</span><span class="task-stars">⭐⭐⭐</span></div>
+ <div class="task-body">Вікторина, де правильні відповіді дають досвід і рівень персонажу.<p><strong>Вимоги:</strong></p><ul><li>5 питань на тему Python або будь-яку іншу</li><li>за кожну правильну відповідь +20 XP</li><li>в кінці визнач рівень через match/case:</li></ul><table class="reftable"><tr><th>XP</th><th>Рівень</th></tr><tr><td>0–19</td><td>Новачок 🥚</td></tr><tr><td>20–39</td><td>Учень 🌱</td></tr><tr><td>40–59</td><td>Знавець ⚡</td></tr><tr><td>60–79</td><td>Майстер 🔥</td></tr><tr><td>80–100</td><td>Легенда 🏆</td></tr></table><p>Виведи фінальний результат красиво.</p></div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-В" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-В"><div class="code-block" id="cb-sV"></div><p class="reveal-tip">💡 <code class="inline">xp // 20</code> дає 0,1,2,3,4 — зручно для match. <code class="inline">case 4 | 5</code> охоплює 80 і 100 XP</p></div>
+</div>
+
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">06</span><h3>📋 Що вивчили на цьому уроці</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<ul><li>match/case — зручна альтернатива довгому if/elif для конкретних значень</li><li><code class="inline">|</code> замість <code class="inline">or</code> — для кількох значень в одному case</li><li><code class="inline">case _</code> — default, виконується якщо нічого не збіглось</li><li>guard (<code class="inline">case n if умова:</code>) — умова всередині case</li><li>match/case і if чудово поєднуються</li><li>match/case — тільки Python 3.10+</li></ul>
+ </div>
+</section>
+</main>
+<footer>Python · Розгалуження — Урок 3 · сендбокси виконуються через Pyodide прямо в браузері</footer>
+<script src="https://cdn.jsdelivr.net/pyodide/v314.0.2/full/pyodide.js"></script>
+<script>
+const CODE_BLOCKS = {
+ "cb-cmp": [
+  {
+   "name": "if_elif.py",
+   "code": "day = input('День: ').lower()\n\nif day == 'понеділок':\n    print('Початок тижня')\nelif day == 'середа':\n    print('Середина тижня')\nelif day == 'субота' or \\\n        day == 'неділя':\n    print('Вихідний')\nelse:\n    print('Звичайний день')",
+   "input": true
+  },
+  {
+   "name": "match_case.py",
+   "code": "day = input('День: ').lower()\n\nmatch day:\n    case 'понеділок':\n        print('Початок тижня')\n    case 'середа':\n        print('Середина тижня')\n    case 'субота' | 'неділя':\n        print('Вихідний')\n    case _:\n        print('Звичайний день')",
+   "input": true
+  }
+ ],
+ "cb-bonus": [
+  {
+   "name": "15_match_список.py",
+   "code": "data = input('Введіть у рядок ім\\'я, вік, зріст у см, вагу у кг та хоббі, через пробіл: ').split()\n\nif len(data) == 5:\n    print(f'Я - {data[0]}, мені - {data[1]}, мій зріст - {data[2]} см, моя вага - {data[3]} кг. Моє хоббі - {data[4]}.')\nelif len(data) == 4:\n    print(f'Я - {data[0]}, мені - {data[1]}, мій зріст - {data[2]} см, моя вага - {data[3]} кг.')\nelif len(data) == 3:\n    print(f'Я - {data[0]}, мені - {data[1]}, мій зріст - {data[2]} см.')\nelif len(data) == 2:\n    print(f'Я - {data[0]}, мені - {data[1]}.')\nelse:\n    print('Некоректні дані')\n\nprint()\n\n# Конструкція match/case(працює швидше за конструкцію з використанням if):\nmatch data:\n    case name, age, height, weight, hobby:\n        print(f'Я - {name}, мені - {age}, мій зріст - {height} см, моя вага - {weight} кг. Моє хоббі - {hobby}.')\n    case name, age, height, weight:\n        print(f'Я - {name}, мені - {age}, мій зріст - {height} см, моя вага - {weight} кг.')\n    case name, age, height:\n        print(f'Я - {name}, мені - {age}, мій зріст - {height} см.')\n    case name, age:\n        print(f'Я - {name}, мені - {age}.')\n    case _:\n        print('Некоректні дані')",
+   "input": true
+  },
+  {
+   "name": "бонус_split.py",
+   "code": "data = input('Введи ім\\'я і вік через пробіл: ').split()\n\nmatch data:\n    case [name, age]:\n        print(f'Привіт, {name}! Тобі {age} років.')\n    case [name]:\n        print(f'Привіт, {name}!')\n    case _:\n        print('Некоректний ввід')",
+   "input": true
+  }
+ ],
+ "cb-f14": [
+  {
+   "name": "14_match_день.py",
+   "code": "day = input('Введіть день тижня:').lower()\n\nif day == 'понеділок':\n    print('Початок робочого тижня')\nelif day == 'вівторок':\n    print('Другий робочий день')\nelif day == 'середа':\n    print('Середина тижня')\nelif day == 'четвер':\n    print('Предостанній робочий день')\nelif day == 'п\\'ятниця':\n    print('Останній робочий день тижня')\nelif day == 'субота' or day == 'неділя':\n    print('Сьогодні вихідний')\nelse:\n    print('Немає такого дня тижня')\n\nprint()\n\n# Конструкція match/case(працює швидше за конструкцію з використанням if):\nmatch day:\n    case 'понеділок':\n        print('Початок робочого тижня')\n    case 'вівторок':\n        print('Другий робочий день')\n    case 'середа':\n        print('Середина тижня')\n    case 'четвер':\n        print('Предостанній робочий день')\n    case 'п\\'ятниця':\n        print('Останній робочий день тижня')\n    case 'субота' | 'неділя':\n        print('Сьогодні вихідний')\n    case _:\n        print('Немає такого дня тижня')",
+   "input": true
+  }
+ ],
+ "cb-s1": [
+  {
+   "name": "task1.py",
+   "code": "number = int(input('Введи число: '))\n\n# Варіант 1 — match з guard (if після case):\nmatch number:\n    case n if n > 0:\n        print('Додатнє')\n    case n if n < 0:\n        print('Від\\'ємне')\n    case _:\n        print('Нуль')\n\n# Варіант 2 — визначаємо знак через if, потім match:\nsign = 'positive' if number > 0 else ('negative' if number < 0 else 'zero')\nmatch sign:\n    case 'positive': print('Додатнє')\n    case 'negative': print('Від\\'ємне')\n    case 'zero':     print('Нуль')",
+   "input": true
+  }
+ ],
+ "cb-s2": [
+  {
+   "name": "task2.py",
+   "code": "day = input('Введи день тижня: ').lower()\n\nmatch day:\n    case 'понеділок':\n        print('Початок робочого тижня')\n    case 'вівторок':\n        print('Другий робочий день')\n    case 'середа':\n        print('Середина тижня')\n    case 'четвер':\n        print('Передостанній робочий день')\n    case 'п\\'ятниця':\n        print('Останній робочий день')\n    case 'субота' | 'неділя':\n        print('Вихідний, відпочиваємо!')\n    case _:\n        print('Немає такого дня тижня')",
+   "input": true
+  }
+ ],
+ "cb-s3": [
+  {
+   "name": "task3.py",
+   "code": "a = float(input('Перше число: '))\nb = float(input('Друге число: '))\nop = input('Операція (+, -, *, /): ')\n\nmatch op:\n    case '+':\n        print('Результат:', a + b)\n    case '-':\n        print('Результат:', a - b)\n    case '*':\n        print('Результат:', a * b)\n    case '/':\n        if b == 0:\n            print('Помилка: ділення на нуль')\n        else:\n            print('Результат:', a / b)\n    case _:\n        print('Невідома операція:', op)",
+   "input": true
+  }
+ ],
+ "cb-s4": [
+  {
+   "name": "task4.py",
+   "code": "import math\n\na = float(input('a = '))\nb = float(input('b = '))\nc = float(input('c = '))\n\nif a == 0:\n    print('Це не квадратне рівняння (a не може бути 0)')\nelse:\n    D = b**2 - 4*a*c\n\n    # Визначаємо тип результату для match:\n    d_type = 'two' if D > 0 else ('one' if D == 0 else 'none')\n\n    match d_type:\n        case 'two':\n            x1 = (-b + math.sqrt(D)) / (2*a)\n            x2 = (-b - math.sqrt(D)) / (2*a)\n            print(f'Два корені: x1 = {x1:.2f}, x2 = {x2:.2f}')\n        case 'one':\n            x = -b / (2*a)\n            print(f'Один корінь: x = {x:.2f}')\n        case 'none':\n            print('Дійсних коренів немає')",
+   "input": true
+  }
+ ],
+ "cb-s5": [
+  {
+   "name": "task5.py",
+   "code": "a = float(input('Сторона a: '))\nb = float(input('Сторона b: '))\nc = float(input('Сторона c: '))\n\n# Перевірка чи існує трикутник:\nif a + b <= c or a + c <= b or b + c <= a:\n    print('Це не трикутник!')\nelse:\n    # Визначаємо тип для match:\n    if a == b == c:\n        t_type = 'equal'\n    elif a == b or b == c or a == c:\n        t_type = 'isosceles'\n    else:\n        t_type = 'scalene'\n\n    match t_type:\n        case 'equal':\n            print('Рівносторонній трикутник')\n        case 'isosceles':\n            print('Рівнобедрений трикутник')\n        case 'scalene':\n            print('Різносторонній трикутник')\n\n    # Бонус — перевірка прямокутного:\n    sides = sorted([a, b, c])\n    if sides[0]**2 + sides[1]**2 == sides[2]**2:\n        print('До того ж він прямокутний!')",
+   "input": true
+  }
+ ],
+ "cb-s6": [
+  {
+   "name": "task6.py",
+   "code": "month = int(input('Введи місяць (1-12): '))\n\nif month < 1 or month > 12:\n    print('Помилка: введи число від 1 до 12')\nelse:\n    match month:\n        case 12 | 1 | 2:\n            print('Зима ❄️')\n        case 3 | 4 | 5:\n            print('Весна 🌸')\n        case 6 | 7 | 8:\n            print('Літо ☀️')\n        case 9 | 10 | 11:\n            print('Осінь 🍂')\n\n    # Бонус — кількість днів:\n    match month:\n        case 2:\n            year = int(input('Рік (для лютого): '))\n            days = 29 if (year % 4 == 0 and year % 100 != 0) or year % 400 == 0 else 28\n        case 4 | 6 | 9 | 11:\n            days = 30\n        case _:\n            days = 31\n    print(f'Днів у місяці: {days}')",
+   "input": true
+  }
+ ],
+ "cb-sB": [
+  {
+   "name": "project_B.py",
+   "code": "import math\n\nprint('=' * 35)\nprint('      РОЗУМНИЙ КАЛЬКУЛЯТОР')\nprint('=' * 35)\nprint('  1. Додавання      (+)')\nprint('  2. Віднімання     (-)')\nprint('  3. Множення       (*)')\nprint('  4. Ділення        (/)')\nprint('  5. Остача         (%)')\nprint('  6. Ціле ділення   (//)')\nprint('  7. Степінь        (**)')\nprint('  8. Квадратний корінь (√)')\nprint('=' * 35)\n\na_str = input('Перше число: ')\nif not a_str:\n    print('Помилка: число не введено')\nelse:\n    a = float(a_str)\n    op = input('Операція: ')\n\n    match op:\n        case '+' | '1':\n            b = float(input('Друге число: '))\n            print(f'Результат: {a} + {b} = {a + b}')\n        case '-' | '2':\n            b = float(input('Друге число: '))\n            print(f'Результат: {a} - {b} = {a - b}')\n        case '*' | '3':\n            b = float(input('Друге число: '))\n            print(f'Результат: {a} * {b} = {a * b}')\n        case '/' | '4':\n            b = float(input('Друге число: '))\n            print('Ділення на нуль!' if b == 0 else f'Результат: {a} / {b} = {a / b:.4f}')\n        case '%' | '5':\n            b = float(input('Друге число: '))\n            print(f'Результат: {a} % {b} = {a % b}')\n        case '//' | '6':\n            b = float(input('Друге число: '))\n            print(f'Результат: {a} // {b} = {a // b}')\n        case '**' | '7':\n            b = float(input('Степінь: '))\n            print(f'Результат: {a} ** {b} = {a ** b}')\n        case '√' | '8':\n            if a < 0:\n                print('Помилка: корінь з від\\'ємного числа!')\n            else:\n                print(f'Результат: √{a} = {math.sqrt(a):.4f}')\n        case _:\n            print('Невідома операція')",
+   "input": true
+  }
+ ],
+ "cb-sV": [
+  {
+   "name": "project_V.py",
+   "code": "xp = 0\nprint('=== ВІКТОРИНА PYTHON-RPG ===')\nprint('За кожну правильну відповідь +20 XP\\n')\n\n# Питання 1\nans = input('Яка функція виводить текст у Python? (print/show/display): ').lower()\nif ans == 'print':\n    xp += 20\n    print('✅ Правильно!')\nelse:\n    print('❌ Неправильно. Відповідь: print')\n\n# Питання 2\nans = input('\\nЯк отримати рядок від користувача? (input/scan/read): ').lower()\nif ans == 'input':\n    xp += 20\n    print('✅ Правильно!')\nelse:\n    print('❌ Неправильно. Відповідь: input')\n\n# Питання 3\nans = input('\\nЯке значення поверне 0 == False? (True/False): ').lower()\nif ans == 'true':\n    xp += 20\n    print('✅ Правильно!')\nelse:\n    print('❌ Неправильно. Відповідь: True')\n\n# Питання 4\nans = input('\\nЯкий оператор дає остачу від ділення? (% / // **): ')\nif ans == '%':\n    xp += 20\n    print('✅ Правильно!')\nelse:\n    print('❌ Неправильно. Відповідь: %')\n\n# Питання 5\nans = input('\\nЩо виведе not True? (False/True/Error): ').lower()\nif ans == 'false':\n    xp += 20\n    print('✅ Правильно!')\nelse:\n    print('❌ Неправильно. Відповідь: False')\n\n# Результат\nprint(f'\\n=== РЕЗУЛЬТАТ: {xp}/100 XP ===')\n\nlevel_group = xp // 20  # 0,1,2,3,4,5\nmatch level_group:\n    case 0: print('Рівень: Новачок 🥚')\n    case 1: print('Рівень: Учень 🌱')\n    case 2: print('Рівень: Знавець ⚡')\n    case 3: print('Рівень: Майстер 🔥')\n    case 4 | 5: print('Рівень: Легенда 🏆')",
+   "input": true
+  }
+ ]
+};
+
+let pyodideReadyPromise = null;
+function setStatus(state, text){
+  const el = document.getElementById('pyoStatus');
+  const t = document.getElementById('pyoStatusText');
+  el.classList.remove('ready','loading');
+  if(state) el.classList.add(state);
+  t.textContent = text;
+}
+function getPyodide(){
+  if(!pyodideReadyPromise){
+    setStatus('loading', 'Python-середовище: завантаження…');
+    pyodideReadyPromise = loadPyodide().then(async (pyodide) => {
+      pyodide.globals.set("_js_prompt", (msg) => {
+        const v = window.prompt(msg && msg.length ? msg : "Введіть значення:");
+        return v === null ? "" : v;
+      });
+      await pyodide.runPythonAsync(`
+import builtins
+def input(prompt=""):
+    val = _js_prompt(prompt)
+    print(str(prompt) + str(val))
+    return val
+builtins.input = input
+`);
+      setStatus('ready', 'Python-середовище: готове');
+      return pyodide;
+    }).catch((e) => {
+      setStatus('loading', 'Не вдалося завантажити Python-середовище');
+      throw e;
+    });
+  }
+  return pyodideReadyPromise;
+}
+function escapeHtml(str){
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+async function runSandbox(blockId, fileIndex, btn){
+  const output = document.getElementById(blockId + '-output-' + fileIndex);
+  const textarea = document.getElementById(blockId + '-code-' + fileIndex);
+  const code = textarea.value;
+  output.classList.add('visible');
+  output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>завантаження Python…';
+  btn.disabled = true;
+  try{
+    const pyodide = await getPyodide();
+    let buffer = [];
+    pyodide.setStdout({ batched: (s) => buffer.push(s) });
+    pyodide.setStderr({ batched: (s) => buffer.push(s) });
+    const globalsDict = pyodide.globals.get('dict')();
+    try{
+      await pyodide.runPythonAsync(code, { globals: globalsDict });
+    } catch(err){
+      buffer.push(String(err));
+    } finally {
+      globalsDict.destroy();
+      pyodide.setStdout({});
+      pyodide.setStderr({});
+    }
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>' + (buffer.length ? escapeHtml(buffer.join('\n')) : '(немає виводу)');
+  } catch(e){
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>Помилка запуску: ' + escapeHtml(String(e));
+  } finally {
+    btn.disabled = false;
+  }
+}
+function renderCodeBlock(blockId, files){
+  const container = document.getElementById(blockId);
+  if(!container || container.dataset.rendered) return;
+  container.dataset.rendered = "1";
+  const hasInput = files.some(f => f.input);
+  let tabsHtml = '';
+  if(files.length > 1){
+    tabsHtml = '<div class="cb-tabs">' + files.map((f,i) =>
+      `<div class="cb-tab${i===0?' active':''}" data-idx="${i}">${f.name}</div>`
+    ).join('') + '</div>';
+  } else {
+    tabsHtml = `<div class="cb-tabs"><div class="cb-label">${files[0].name}</div></div>`;
+  }
+  let editorsHtml = files.map((f,i) =>
+    `<textarea class="cb-editor" id="${blockId}-code-${i}" style="display:${i===0?'block':'none'}" spellcheck="false">${escapeHtml(f.code)}</textarea>`
+  ).join('');
+  let outputsHtml = files.map((f,i) => `<div class="cb-output" id="${blockId}-output-${i}"></div>`).join('');
+  container.innerHTML = tabsHtml + editorsHtml +
+    `<div class="cb-toolbar">
+      <button class="cb-run" id="${blockId}-run">▶ Запустити</button>
+      ${hasInput ? '<span class="cb-hint">💡 код запитує дані — браузер покаже віконце для введення</span>' : ''}
+    </div>` + outputsHtml;
+
+  let activeIdx = 0;
+  if(files.length > 1){
+    container.querySelectorAll('.cb-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const idx = parseInt(tab.dataset.idx, 10);
+        container.querySelectorAll('.cb-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        files.forEach((f,i) => {
+          document.getElementById(`${blockId}-code-${i}`).style.display = (i===idx) ? 'block' : 'none';
+          document.getElementById(`${blockId}-output-${i}`).classList.remove('visible');
+        });
+        activeIdx = idx;
+      });
+    });
+  }
+  document.getElementById(blockId + '-run').addEventListener('click', function(){
+    runSandbox(blockId, activeIdx, this);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-toggle]').forEach(header => {
+    header.addEventListener('click', () => {
+      const phase = header.closest('.phase');
+      const body = phase.querySelector('.phase-body');
+      if(phase.classList.contains('open')){
+        body.style.maxHeight = body.scrollHeight + 'px';
+        requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
+        phase.classList.remove('open');
+      } else {
+        phase.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+        setTimeout(() => { if(phase.classList.contains('open')) body.style.maxHeight = 'none'; }, 360);
+      }
+    });
+  });
+  ['cb-cmp','cb-f14','cb-bonus'].forEach(id => renderCodeBlock(id, CODE_BLOCKS[id]));
+  document.querySelectorAll('.reveal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.reveal);
+      const isOpen = target.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.innerHTML = '<span class="chev">▸</span> ' + (isOpen ? btn.dataset.labelOpen : btn.dataset.labelClosed);
+      if(isOpen){
+        const cb = target.querySelector('.code-block');
+        if(cb && CODE_BLOCKS[cb.id]) renderCodeBlock(cb.id, CODE_BLOCKS[cb.id]);
+        const ph = btn.closest('.phase-body');
+        if(ph) ph.style.maxHeight = 'none';
+      }
+    });
+  });
+  const firstPhase = document.querySelector('.phase');
+  if(firstPhase){
+    firstPhase.classList.add('open');
+    firstPhase.querySelector('.phase-body').style.maxHeight = 'none';
+  }
+});
+</script>
+</body>
+</html>
