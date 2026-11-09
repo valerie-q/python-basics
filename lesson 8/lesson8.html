@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python · Цикли — Урок 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F5; --panel:#FFFFFF; --ink:#17151A; --ink-soft:#5B584F; --ink-faint:#918D82;
+    --red:#C81E1E; --red-deep:#8C1410; --red-wash:#FBEAE9; --rule:#E6E2D8; --code-bg:#F4F2EC;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'IBM Plex Sans', -apple-system, sans-serif;
+    --display:'Manrope', var(--sans);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.6; font-size:16px; -webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--red); color:#fff;}
+
+  header.hero{padding:56px 24px 32px; max-width:880px; margin:0 auto; border-bottom:1px solid var(--rule);}
+  .eyebrow{font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--red); font-weight:700; display:flex; align-items:center; gap:8px;}
+  .eyebrow::before{content:"›_"; color:var(--red);}
+  h1.title{font-family:var(--display); font-weight:800; font-size:clamp(1.8rem,4vw,2.6rem); margin:10px 0 6px; letter-spacing:-0.01em;}
+  .subtitle{color:var(--ink-soft); font-size:1.02rem; max-width:60ch;}
+  .pyostatus{margin-top:18px; display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:.8rem; color:var(--ink-soft); border:1px solid var(--rule); background:var(--panel); padding:6px 12px; border-radius:999px;}
+  .pyostatus .dot{width:8px; height:8px; border-radius:50%; background:var(--ink-faint); transition:background .3s;}
+  .pyostatus.ready .dot{background:#2E8B57;}
+  .pyostatus.loading .dot{background:var(--red); animation:blink 1s infinite;}
+  @keyframes blink{50%{opacity:.25;}}
+
+  nav.daynav{position:sticky; top:0; z-index:20; background:rgba(250,249,245,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--rule); padding:10px 24px;}
+  nav.daynav .wrap{max-width:880px; margin:0 auto; display:flex; gap:8px; flex-wrap:wrap;}
+  nav.daynav a{font-family:var(--mono); font-size:.78rem; text-decoration:none; color:var(--ink-soft); border:1px solid var(--rule); padding:5px 12px; border-radius:999px; background:var(--panel); transition:.15s;}
+  nav.daynav a:hover{border-color:var(--red); color:var(--red-deep);}
+
+  main{max-width:880px; margin:0 auto; padding:8px 24px 100px;}
+
+  .phase{background:var(--panel); border:1px solid var(--rule); border-radius:14px; margin:18px 0; overflow:hidden;}
+  .phase-header{display:flex; align-items:center; gap:14px; padding:16px 20px; cursor:pointer; user-select:none;}
+  .phase-header .phase-num{font-family:var(--mono); color:var(--red); font-weight:700; font-size:.85rem; flex:0 0 auto;}
+  .phase-header h3{font-family:var(--display); font-weight:700; font-size:1.08rem; margin:0; flex:1;}
+  .phase-header .chev{font-family:var(--mono); color:var(--ink-faint); transition:transform .25s; font-size:.9rem;}
+  .phase.open .phase-header .chev{transform:rotate(90deg); color:var(--red);}
+  .phase-body{max-height:0; overflow:hidden; transition:max-height .35s ease; padding:0 22px;}
+  .phase.open .phase-body{padding:0 22px 22px;}
+  .phase-body > *:first-child{margin-top:0;}
+
+  h4.sub{font-family:var(--display); font-weight:700; font-size:1rem; margin:22px 0 8px; color:var(--ink);}
+  p{margin:10px 0;}
+  ul, ol{padding-left:1.3em;}
+  li{margin:5px 0;}
+  code.inline, .inline-code{font-family:var(--mono); background:var(--code-bg); padding:1px 6px; border-radius:5px; font-size:.9em;}
+  strong{color:var(--ink);}
+  pre.static{margin:10px 0; padding:14px 18px; background:var(--code-bg); border:1px solid var(--rule); border-radius:10px; font-family:var(--mono); font-size:.85rem; white-space:pre; overflow-x:auto;}
+
+  blockquote.callout{border-left:3px solid var(--red); background:var(--red-wash); margin:14px 0; padding:12px 16px; border-radius:0 10px 10px 0; font-size:.95rem;}
+  blockquote.callout.warn{border-left-color:var(--ink-faint); background:var(--code-bg);}
+  .callout ul{margin:6px 0 0;}
+
+  table.reftable{width:100%; border-collapse:collapse; margin:16px 0; font-size:.92rem;}
+  table.reftable th{background:var(--red); color:#fff; text-align:left; padding:9px 12px; font-family:var(--display); font-weight:700; font-size:.85rem;}
+  table.reftable td{padding:8px 12px; border-bottom:1px solid var(--rule);}
+  table.reftable td:first-child{font-family:var(--mono); white-space:nowrap; color:var(--red-deep);}
+  table.reftable tr:nth-child(even){background:var(--code-bg);}
+
+  .code-block{margin:16px 0; border:1px solid var(--rule); border-radius:12px; overflow:hidden; background:var(--panel);}
+  .cb-tabs{display:flex; background:var(--code-bg); border-bottom:1px solid var(--rule); overflow-x:auto;}
+  .cb-tab{font-family:var(--mono); font-size:.8rem; padding:9px 16px; cursor:pointer; white-space:nowrap; color:var(--ink-soft); border-right:1px solid var(--rule); background:transparent; border-top:2px solid transparent;}
+  .cb-tab.active{background:var(--panel); color:var(--ink); border-top:2px solid var(--red); font-weight:600;}
+  .cb-label{font-family:var(--mono); font-size:.75rem; color:var(--ink-faint); padding:9px 14px; border-right:1px solid var(--rule);}
+  .cb-editor{width:100%; border:none; resize:vertical; background:var(--code-bg); color:var(--ink); font-family:var(--mono); font-size:.87rem; line-height:1.55; padding:16px 18px; min-height:60px; display:block; tab-size:4;}
+  .cb-editor:focus{outline:none; background:#F8F6F0;}
+  .cb-toolbar{display:flex; align-items:center; gap:12px; padding:10px 16px; border-top:1px solid var(--rule);}
+  .cb-run{font-family:var(--mono); font-size:.82rem; font-weight:700; color:#fff; background:var(--red); border:none; border-radius:8px; padding:8px 18px; cursor:pointer; display:flex; align-items:center; gap:7px; transition:.15s;}
+  .cb-run:hover{background:var(--red-deep);}
+  .cb-run:disabled{background:var(--ink-faint); cursor:wait;}
+  .cb-hint{font-family:var(--mono); font-size:.74rem; color:var(--ink-faint);}
+  .cb-output{display:none; border-top:1px dashed var(--rule); padding:14px 18px; background:#FFFFFF; font-family:var(--mono); font-size:.85rem; white-space:pre-wrap; word-break:break-word;}
+  .cb-output.visible{display:block;}
+  .cb-output .tag{color:var(--red); font-weight:700; margin-right:4px;}
+
+  .task-card{border-left:4px solid var(--red); background:var(--panel); border-radius:0 12px 12px 0; padding:16px 20px; margin:16px 0; border-top:1px solid var(--rule); border-right:1px solid var(--rule); border-bottom:1px solid var(--rule);}
+  .task-card .task-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .task-badge{font-family:var(--mono); font-weight:700; font-size:.78rem; color:#fff; background:var(--red); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .task-title{font-family:var(--display); font-weight:700; font-size:1rem;}
+  .task-stars{font-size:.78rem; color:var(--red); margin-left:auto; font-family:var(--mono);}
+  .task-body{color:var(--ink); font-size:.96rem;}
+
+  .reveal-btn{margin-top:12px; font-family:var(--mono); font-size:.8rem; color:var(--red-deep); background:var(--red-wash); border:1px solid #EFC9C7; border-radius:8px; padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .reveal-btn:hover{background:#F6DAD8;}
+  .reveal-btn.open .chev{transform:rotate(90deg);}
+  .reveal-btn .chev{transition:transform .2s; display:inline-block;}
+  .reveal-content{display:none; margin-top:10px;}
+  .reveal-content.open{display:block;}
+  .reveal-tip{font-size:.85rem; color:var(--ink-soft); font-style:italic; margin:8px 0 0;}
+
+  footer{max-width:880px; margin:60px auto 40px; padding:0 24px; color:var(--ink-faint); font-size:.85rem; font-family:var(--mono); border-top:1px solid var(--rule); padding-top:20px;}
+
+  @media (max-width:600px){ header.hero{padding:40px 16px 24px;} main{padding:8px 16px 80px;} .cb-editor{font-size:.8rem;} }
+  .btn-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
+  .btn-row .reveal-btn{margin-top:0;}
+  .task-body ul,.task-body ol{margin:6px 0;}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">python · цикли · урок 1</div>
+  <h1 class="title">Цикл while, break, continue, while True</h1>
+  <p class="subtitle">Цикл з передумовою, нескінченні цикли й виходи з них</p>
+</header>
+<nav class="daynav"><div class="wrap"><a href="#theory">Теорія</a><a href="#practice">Практика</a><a href="#homework">Домашнє завдання</a></div></nav>
+<main>
+<div id="theory"></div>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">01</span><h3>Що таке цикл і навіщо він потрібен</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<p>Цикл — це коли комп'ютер повторює один і той самий блок коду багато разів. Ми задаємо умову, і поки вона виконується — цикл крутиться. Без циклу, щоб вивести числа від 1 до 5, треба писати 5 рядків:</p>
+<div class="code-block" id="cb-intro"></div>
+<p>В Python є два типи циклів:</p>
+<ul><li><code class="inline">while</code> — цикл з передумовою (виконується, поки умова True)</li><li><code class="inline">for</code> — цикл з лічильником (вивчимо на наступному уроці)</li></ul>
+<blockquote class="callout"><strong>📌 Нові поняття:</strong><br><strong>Ітерація</strong> — один прохід циклу через тіло (блок коду всередині).<br><strong>Тіло циклу</strong> — блок коду з відступом, який повторюється.<br><strong>Нескінченний цикл</strong> — цикл, який ніколи не зупиняється сам.</blockquote>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">02</span><h3>Цикл while — синтаксис</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<pre class="static">while умова:
+    # тіло циклу (з відступом!)
+    оператори</pre>
+<blockquote class="callout">💡 Відступ 4 пробіли — обов'язковий, як і в if</blockquote>
+<h4 class="sub">Як працює</h4>
+<ul><li>Перевіряється умова</li><li>Якщо True — виконується тіло, потім знову перевіряється умова</li><li>Якщо False — цикл завершується, програма йде далі</li><li>Якщо умова хибна з самого початку — тіло не виконується жодного разу</li></ul>
+<p>Блок операторів не може бути порожнім. Якщо така необхідність виникає, можна скористатися оператором <code class="inline">pass</code>, який нічого не робить.</p>
+<h4 class="sub">Приклад — числа від 1 до 10 (файл 0_while.py)</h4>
+<div class="code-block" id="cb-while0"></div>
+<blockquote class="callout">💡 <code class="inline">n += 1</code> — скорочений запис <code class="inline">n = n + 1</code>. Обов'язково змінюйте умову, інакше цикл буде нескінченним!</blockquote>
+<h4 class="sub">Приклад — ввід позитивного числа (файл 1_while.py)</h4>
+<div class="code-block" id="cb-while1"></div>
+<blockquote class="callout">💡 Якщо відразу ввести правильне число — цикл не виконається жодного разу. Це «цикл валідації вводу» — дуже поширений патерн у програмуванні.</blockquote>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">03</span><h3>while True — нескінченний цикл</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<p>Іноді потрібно, щоб цикл працював постійно — наприклад, меню програми. Для цього використовують <code class="inline">while True</code>:</p>
+<pre class="static">print(&#x27;Усі натуральні числа:&#x27;)
+
+n = 1
+
+while True:  # нескінченний цикл
+    print(n)
+    n += 1</pre>
+<blockquote class="callout warn"><strong>⚠️ Файл 2_while_true.py</strong> показує нескінченне виведення натуральних чисел — запускай його обережно, тільки у VS Code. Тому тут це просто код без кнопки запуску.<br>Такий цикл можна зупинити тільки:<ul><li>оператором <code class="inline">break</code> (вивчимо далі)</li><li>комбінацією <span class="inline-code">Ctrl+C</span> у терміналі</li></ul></blockquote>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">04</span><h3>Оператор break — вихід з циклу</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<p>Якщо необхідно перервати виконання циклу достроково, використовується оператор <strong>break</strong>. Він миттєво зупиняє цикл і переходить до коду після нього.</p>
+<h4 class="sub">Простий приклад (файл 3_break.py)</h4>
+<div class="code-block" id="cb-break3"></div>
+<blockquote class="callout">💡 <code class="inline">break</code> зазвичай стоїть усередині <code class="inline">if</code> — інакше цикл зупинився б на першій ітерації</blockquote>
+<h4 class="sub">Складніший приклад — програма з меню (файл 4_break.py)</h4>
+<div class="code-block" id="cb-break4"></div>
+<blockquote class="callout">💡 <code class="inline">while True</code> + <code class="inline">break</code> — класичний спосіб зробити меню програми</blockquote>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">05</span><h3>Оператор continue — пропуск ітерації</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<p>Якщо необхідно завершити виконання поточної ітерації та перейти до наступної, використовується оператор <strong>continue</strong>. Він пропускає решту тіла циклу і переходить до наступної ітерації (перевірки умови).</p>
+<p>Порівняй: <strong>break</strong> зупиняє весь цикл, <strong>continue</strong> пропускає тільки одну ітерацію.</p>
+<div class="code-block" id="cb-cmp"></div>
+<h4 class="sub">Файл 5_continue.py — числа від 1 до 10, крім 5</h4>
+<div class="code-block" id="cb-cont5"></div>
+<blockquote class="callout">💡 <code class="inline">x += 1</code> стоїть ДО <code class="inline">continue</code> — інакше при x=5 він ніколи не збільшиться і вийде нескінченний цикл!</blockquote>
+<blockquote class="callout warn"><strong>⚠️ Типові помилки початківців:</strong><ol><li>Забути змінити лічильник (<code class="inline">n += 1</code>) → нескінченний цикл</li><li>Поставити <code class="inline">n += 1</code> після <code class="inline">continue</code> → нескінченний цикл</li><li>Забути відступ у тілі циклу → синтаксична помилка</li><li><code class="inline">break</code> або <code class="inline">continue</code> поза циклом → SyntaxError</li></ol></blockquote>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">06</span><h3>Практика</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<div id="practice"></div>
+<h4 class="sub">⭐ Рівень 1 — while</h4>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">1</span><span class="task-title">Лічильник до N</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Запитай число N. Виведи всі числа від 1 до N включно.<br>Використай <code class="inline">while</code> з лічильником.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-1" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-1"><div class="code-block" id="cb-1"></div><p class="reveal-tip">💡 <code class="inline">i</code> — лічильник. Починаємо з 1, збільшуємо на 1 кожну ітерацію, зупиняємось коли <code class="inline">i &gt; n</code></p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">2</span><span class="task-title">Сума від 1 до N</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Запитай число N. Порахуй і виведи суму всіх чисел від 1 до N.<br>Наприклад: N=5 → 1+2+3+4+5 = 15</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-2" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-2"><div class="code-block" id="cb-2"></div><p class="reveal-tip">💡 <code class="inline">total = 0</code> — накопичувач. Кожну ітерацію додаємо поточне <code class="inline">i</code> до загальної суми</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">3</span><span class="task-title">Валідація вводу</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Запитуй число у користувача, поки він не введе число від 1 до 10.<br>Якщо введено неправильне число — виведи «Спробуй ще раз» і запитай знову.<br>Коли введено правильне — виведи «Чудово!»</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-3" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-3"><div class="code-block" id="cb-3"></div><p class="reveal-tip">💡 Умова while перевіряє діапазон. Цикл крутиться, поки число поза діапазоном</p></div>
+</div>
+<h4 class="sub">⭐⭐ Рівень 2 — break і continue</h4>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">4</span><span class="task-title">Числа без кратних 3</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Виведи числа від 1 до 20, пропускаючи кратні 3 (3, 6, 9…).<br>Використай <code class="inline">continue</code>.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-4" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-4"><div class="code-block" id="cb-4"></div><p class="reveal-tip">💡 <code class="inline">x += 1</code> стоїть ДО <code class="inline">continue</code> — інакше при кратному 3 лічильник ніколи не збільшиться!</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">5</span><span class="task-title">Знайди перше парне</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Запитуй числа від користувача, поки не введе парне.<br>Як тільки введено парне — виведи «Знайшли парне: X» і зупинись (<code class="inline">break</code>).</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-5" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-5"><div class="code-block" id="cb-5"></div><p class="reveal-tip">💡 <code class="inline">while True</code> + <code class="inline">break</code> — цикл крутиться до першого парного числа</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">6</span><span class="task-title">Відгадай число</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Задай у коді число (наприклад, 42). Запитуй користувача, поки він не вгадає.<br>Підказуй: «Більше» або «Менше» після кожної спроби.<br>Коли вгадає — виведи, скільки спроб знадобилось, і зупинись через <code class="inline">break</code>.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-6" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-6"><div class="code-block" id="cb-6"></div><p class="reveal-tip">💡 <code class="inline">attempts</code> рахує кількість спроб. Збільшуємо на кожній ітерації незалежно від результату</p></div>
+</div>
+<h4 class="sub">⭐⭐⭐ Рівень 3</h4>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">7</span><span class="task-title">Програма з меню</span><span class="task-stars">⭐⭐⭐</span></div>
+ <div class="task-body">Створи програму з меню через <code class="inline">while True</code> + <code class="inline">break</code>:<ol><li>Порахувати суму двох чисел</li><li>Перевірити, чи парне число</li><li>Вийти</li></ol>Програма має повертатись до меню після кожної дії.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-7" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-7"><div class="code-block" id="cb-7"></div><p class="reveal-tip">💡 <code class="inline">\n</code> перед меню — порожній рядок для зручності читання. Програма повертається до меню щоразу</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">8</span><span class="task-title">Авторизація з 3 спробами</span><span class="task-stars">⭐⭐⭐</span></div>
+ <div class="task-body">Задай логін = 'admin' і пароль = '1234'.<br>Дай користувачу 3 спроби ввести правильні дані.<br>Якщо вгадав — «Вхід успішний! (спроба X з 3)», <code class="inline">break</code>.<br>Якщо всі 3 спроби невдалі — «Доступ заблоковано».</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-8" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-8"><div class="code-block" id="cb-8"></div><p class="reveal-tip">💡 Умова <code class="inline">attempt &lt; max_attempts</code> обмежує кількість спроб. Деталі про <code class="inline">else</code> після <code class="inline">while</code> — на наступному уроці!</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">9</span><span class="task-title">Камінь Ножиці Папір</span><span class="task-stars">⭐⭐⭐</span></div>
+ <div class="task-body">Напишемо консольну гру проти комп'ютера. Будемо використовувати:<ul><li>цикл <code class="inline">while</code> — щоб гра повторювалась, поки студент хоче;</li><li>модуль <code class="inline">random</code> — щоб комп'ютер обирав свій варіант;</li><li>логічні оператори <code class="inline">and</code>, <code class="inline">or</code>, <code class="inline">not</code> — щоб перевіряти, хто виграв.</li></ul>Ми будемо працювати з короткими кодами: <strong>r</strong> — rock (камінь), <strong>s</strong> — scissors (ножиці), <strong>p</strong> — paper (папір). Так зручніше вводити з клавіатури й перевіряти умови в коді.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-9" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-9"><div class="code-block" id="cb-9"></div></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">10</span><span class="task-title">Трекер бюджету для покупок</span><span class="task-stars">⭐⭐⭐</span></div>
+ <div class="task-body">Створіть програму, яка імітує процес покупок із обмеженим бюджетом.<br>Спочатку користувач вводить свій бюджет.<br>Потім програма в циклі пропонує ввести назву товару та його ціну.<br>Якщо ціна не перевищує залишок бюджету, програма додає товар до чеку та віднімає його вартість від бюджету.<br>Якщо грошей недостатньо, потрібно вивести повідомлення про це.<br>Програма повинна працювати в циклі <code class="inline">while</code>, поки користувач не введе слово «стоп» або поки бюджет не закінчиться.<br>Після завершення програма повинна вивести чек із усіма покупками, загальну суму витрат і залишок бюджету.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-10" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-10"><div class="code-block" id="cb-10"></div></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">11</span><span class="task-title">Симулятор банкомата</span><span class="task-stars">⭐⭐⭐</span></div>
+ <div class="task-body">Створіть програму, яка імітує роботу простого банкомата. На початку в програмі є певний баланс рахунку (наприклад 500). У циклі <code class="inline">while</code> користувач повинен бачити меню з кількома діями:<ol><li>Перевірити баланс</li><li>Зняти гроші</li><li>Вийти з програми</li></ol>Якщо користувач обирає перевірку балансу, програма повинна показати поточну суму на рахунку.<br>Якщо користувач обирає зняття грошей, потрібно запитати суму для зняття. Якщо сума перевищує баланс, програма повинна повідомити, що грошей недостатньо. Якщо сума допустима — відняти її від балансу.<br>Програма повинна працювати в циклі, поки користувач не обере вихід з програми.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-11" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-11"><div class="code-block" id="cb-11"></div></div>
+</div>
+
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">07</span><h3>🧭 Домашнє завдання</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<div id="homework"></div><div class="task-card">
+ <div class="task-head"><span class="task-badge">ДЗ1</span><span class="task-title">Таблиця множення</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Запитай число N. Виведи таблицю множення на N від 1 до 10.<br>Наприклад: 3 x 1 = 3, 3 x 2 = 6, …</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-ДЗ1" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-ДЗ1"><div class="code-block" id="cb-ДЗ1"></div></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">ДЗ2</span><span class="task-title">Числова пірамідка</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Запитай N. Виведи числа від N до 1 у зворотному порядку (відлік).<br>Наприклад N=5: <code class="inline">5 4 3 2 1 Старт!</code></div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-ДЗ2" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-ДЗ2"><div class="code-block" id="cb-ДЗ2"></div><p class="reveal-tip">💡 <code class="inline">n -= 1</code> — скорочений запис <code class="inline">n = n - 1</code>. Цикл від N до 1</p></div>
+</div>
+
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">08</span><h3>📋 Що вивчили на цьому уроці</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<ul><li>Цикл — повторення блоку коду, поки умова True</li><li><code class="inline">while умова:</code> — перевіряє умову перед кожною ітерацією</li><li><code class="inline">while True:</code> — нескінченний цикл (зупиняється тільки через break)</li><li><code class="inline">break</code> — миттєво виходить з циклу</li><li><code class="inline">continue</code> — пропускає решту тіла і йде до наступної ітерації</li><li>Ітерація — один прохід тіла циклу</li><li>Обов'язково змінюйте лічильник, інакше — нескінченний цикл!</li></ul>
+ </div>
+</section>
+</main>
+<footer>Python · Цикли — Урок 1 · сендбокси виконуються через Pyodide прямо в браузері</footer>
+<script src="https://cdn.jsdelivr.net/pyodide/v314.0.2/full/pyodide.js"></script>
+<script>
+const CODE_BLOCKS = {
+ "cb-intro": [
+  {
+   "name": "без_циклу.py",
+   "code": "print(1)\nprint(2)\nprint(3)\nprint(4)\nprint(5)\n# А якщо треба до 1000?",
+   "input": false
+  },
+  {
+   "name": "з_циклом.py",
+   "code": "n = 1\nwhile n <= 5:\n    print(n)\n    n += 1\n# Працює для будь-якого числа!",
+   "input": false
+  }
+ ],
+ "cb-while0": [
+  {
+   "name": "0_while.py",
+   "code": "n = 1  # спочатку n дорівнює одиниці\n\nwhile n <= 10:  # поки воно менше або дорівнює десяти\n    print('n =', n)  # виводимо поточне значення n\n    n += 1  # і збільшуємо його на 1",
+   "input": false
+  }
+ ],
+ "cb-while1": [
+  {
+   "name": "1_while.py",
+   "code": "x = 0\n\nwhile x <= 0:  # повторювати, поки x не буде позитивним\n    x = int(input('Введіть позитивне число: '))\n\nprint('Ви ввели число', x)",
+   "input": true
+  }
+ ],
+ "cb-break3": [
+  {
+   "name": "3_break.py",
+   "code": "# простий приклад\nwhile True:\n    print('Введіть exit, щоб завершити цикл')\n    response = input('> ')\n    if response == 'exit':\n        break",
+   "input": true
+  },
+  {
+   "name": "3_break (версія з уроку)",
+   "code": "# Простий приклад (файл 3_break.py):\nwhile True:\n    response = input('Введи exit щоб вийти: ')\n    if response == 'exit':\n        break             # виходимо з циклу\n    print('Ти ввів:', response)\n\nprint('Цикл завершено')   # цей рядок виконається після break",
+   "input": true
+  }
+ ],
+ "cb-break4": [
+  {
+   "name": "4_break.py",
+   "code": "name = None  # спочатку ми не знаємо імені користувача\n\n# нескінченний цикл\nwhile True:\n    print(\"Меню:\\n1. Ввести ім'я\\n2. Вивести вітання\\n3. Вийти\")\n\n    response = input('Оберіть пункт: ')\n    print()\n\n    if response == '1':\n        name = input(\"Введіть ваше ім'я: \")\n    elif response == '2':\n        if name:  # вітаємося з користувачем, якщо ім'я вже введене\n            print('Привіт, ', name, '!', sep='')\n        else:\n            print('Я не знаю вашого імені.')\n    elif response == '3':\n        # оператор break завершує виконання циклу\n        break  # якщо користувач вибрав третій пункт, то виходимо із циклу\n    else:\n        print('Неправильне введення.')\n\n    print()",
+   "input": true
+  },
+  {
+   "name": "4_break (спрощена)",
+   "code": "name = None\n\nwhile True:\n    print('Меню:')\n    print('1. Ввести ім\\'я')\n    print('2. Вивести вітання')\n    print('3. Вийти')\n    response = input('Оберіть пункт: ')\n\n    if response == '1':\n        name = input('Введіть ім\\'я: ')\n    elif response == '2':\n        if name:\n            print('Привіт,', name + '!')\n        else:\n            print('Я не знаю вашого імені.')\n    elif response == '3':\n        break             # вихід з меню\n    else:\n        print('Неправильний вибір')",
+   "input": true
+  }
+ ],
+ "cb-cmp": [
+  {
+   "name": "break_приклад.py",
+   "code": "while True:\n    x = int(input('Число: '))\n    if x == 0:\n        break  # вихід з циклу\n    print(x)\n# після break — сюди",
+   "input": true
+  },
+  {
+   "name": "continue_приклад.py",
+   "code": "x = 0\nwhile x < 10:\n    x += 1\n    if x == 5:\n        continue  # пропускаємо 5\n    print(x)  # 5 не виведеться",
+   "input": false
+  }
+ ],
+ "cb-cont5": [
+  {
+   "name": "5_continue.py",
+   "code": "x = 0\n\nwhile x < 10:\n    x += 1\n\n    if x == 5:  # пропускаємо число 5\n        continue\n\n    print('Поточне число дорівнює', x)",
+   "input": false
+  }
+ ],
+ "cb-1": [
+  {
+   "name": "task1.py",
+   "code": "n = int(input('Введи N: '))\ni = 1\n\nwhile i <= n:\n    print(i)\n    i += 1",
+   "input": true
+  }
+ ],
+ "cb-2": [
+  {
+   "name": "task2.py",
+   "code": "n = int(input('Введи N: '))\ni = 1\ntotal = 0         # накопичувач суми\n\nwhile i <= n:\n    total += i    # додаємо i до суми на кожній ітерації\n    i += 1\n\nprint(f'Сума від 1 до {n} =', total)",
+   "input": true
+  }
+ ],
+ "cb-3": [
+  {
+   "name": "task3.py",
+   "code": "number = 0\n\nwhile number < 1 or number > 10:\n    number = int(input('Введи число від 1 до 10: '))\n    if number < 1 or number > 10:\n        print('Спробуй ще раз!')\n\nprint('Чудово! Ти ввів:', number)",
+   "input": true
+  }
+ ],
+ "cb-4": [
+  {
+   "name": "task4.py",
+   "code": "x = 0\n\nwhile x < 20:\n    x += 1\n    if x % 3 == 0:   # якщо ділиться на 3 без остачі\n        continue      # пропускаємо print\n    print(x)\n\n# Виведе: 1 2 4 5 7 8 10 11 13 14 16 17 19 20",
+   "input": false
+  }
+ ],
+ "cb-5": [
+  {
+   "name": "task5.py",
+   "code": "while True:\n    number = int(input('Введи число: '))\n    if number % 2 == 0:          # якщо парне\n        print(f'Знайшли парне: {number}')\n        break                     # виходимо з циклу\n    else:\n        print('Непарне, спробуй ще')",
+   "input": true
+  }
+ ],
+ "cb-6": [
+  {
+   "name": "task6.py",
+   "code": "secret = 42\nattempts = 0\n\nwhile True:\n    guess = int(input('Вгадай число: '))\n    attempts += 1\n\n    if guess == secret:\n        print(f'Правильно! Знадобилось {attempts} спроб')\n        break\n    elif guess < secret:\n        print('Більше!')\n    else:\n        print('Менше!')",
+   "input": true
+  }
+ ],
+ "cb-7": [
+  {
+   "name": "task7.py",
+   "code": "while True:\n    print('\\n=== МЕНЮ ===')\n    print('1. Сума двох чисел')\n    print('2. Перевірити парність')\n    print('3. Вийти')\n    choice = input('Оберіть пункт: ')\n\n    if choice == '1':\n        a = int(input('a = '))\n        b = int(input('b = '))\n        print(f'Сума: {a + b}')\n    elif choice == '2':\n        n = int(input('Число: '))\n        print('Парне' if n % 2 == 0 else 'Непарне')\n    elif choice == '3':\n        print('До побачення!')\n        break\n    else:\n        print('Невідомий пункт меню')",
+   "input": true
+  }
+ ],
+ "cb-8": [
+  {
+   "name": "task8.py",
+   "code": "correct_login = 'admin'\ncorrect_password = '1234'\nmax_attempts = 3\nattempt = 0\n\nwhile attempt < max_attempts:\n    attempt += 1\n    login = input('Логін: ')\n    password = input('Пароль: ')\n\n    if login == correct_login and password == correct_password:\n        print(f'Вхід успішний! (спроба {attempt} з {max_attempts})')\n        break\n    else:\n        left = max_attempts - attempt\n        if left > 0:\n            print(f'Невірно. Залишилось спроб: {left}')\nelse:\n    print('Доступ заблоковано. Всі спроби вичерпано.')",
+   "input": true
+  }
+ ],
+ "cb-9": [
+  {
+   "name": "task9.py",
+   "code": "import random\n\nprint(\"Гра 'Камінь-ножиці-папір'\")\nprint(\"Вводь: r (rock/камінь), s (scissors/ножиці), p (paper/папір).\")\nprint(\"Щоб завершити гру, напиши: стоп\")\nprint()\n\nplay = \"так\"\n\nwhile play == \"так\":\n    user_code = input(\"Твій вибір (r/s/p): \")\n\n    # Перевірка, що введено коректний код\n    if not (user_code == \"r\" or user_code == \"s\" or user_code == \"p\"):\n        print(\"Я не розумію цей варіант. Спробуй ще раз.\")\n        continue\n\n    # Випадковий вибір комп'ютера з трьох кодів: r, s, p\n    comp_code = random.choice(\"rsp\")   # r - камінь, s - ножиці, p - папір\n\n    print(\"Ти вибрав:\", user_code)\n    print(\"Комп'ютер вибрав:\", comp_code)\n\n    # Визначаємо результат (логіка по кодах r, s, p)\n    if user_code == comp_code:\n        print(\"Нічия!\")\n    elif (user_code == \"r\" and comp_code == \"s\") or \\\n         (user_code == \"s\" and comp_code == \"p\") or \\\n         (user_code == \"p\" and comp_code == \"r\"):\n        print(\"Ти виграв! 🎉\")\n    else:\n        print(\"Ти програв 😢\")\n\n    play = input(\"Грати ще раз? (так/ні): \")\n\n\nprint(\"Гра завершена.\")",
+   "input": true
+  }
+ ],
+ "cb-10": [
+  {
+   "name": "task10.py",
+   "code": "budget = float(input(\"Enter your budget: \"))\nreceipt = \"\"\ntotal = 0\n\nwhile budget > 0:\n    item = input(\"Enter item name (or 'stop' to finish): \")\n\n    if item == \"stop\":\n        break\n\n    price = float(input(\"Enter item price: \"))\n\n    if price > budget:\n        print(\"Not enough money!\")\n    else:\n        budget = budget - price\n        total = total + price\n        receipt = receipt + item + \" - $\" + str(price) + \"\\n\"\n        print(\"Item added!\")\n\n    print(\"Remaining budget:\", budget)\n\nprint(\"\\n--- RECEIPT ---\")\nprint(receipt)\nprint(\"Total spent:\", total)\nprint(\"Money left:\", budget)",
+   "input": true
+  }
+ ],
+ "cb-11": [
+  {
+   "name": "task11.py",
+   "code": "balance = 500\n\nwhile True:\n    print(\"\\n1 - Check balance\")\n    print(\"2 - Withdraw money\")\n    print(\"3 - Exit\")\n\n    choice = input(\"Choose option: \")\n\n    if choice == \"1\":\n        print(\"Your balance:\", balance)\n\n    elif choice == \"2\":\n        amount = int(input(\"Enter amount: \"))\n\n        if amount > balance:\n            print(\"Not enough money!\")\n        else:\n            balance = balance - amount\n            print(\"Withdrawal successful\")\n\n    elif choice == \"3\":\n        break",
+   "input": true
+  }
+ ],
+ "cb-ДЗ1": [
+  {
+   "name": "taskhw1.py",
+   "code": "n = int(input('Введи число: '))\ni = 1\n\nwhile i <= 10:\n    print(f'{n} x {i} = {n * i}')\n    i += 1",
+   "input": true
+  }
+ ],
+ "cb-ДЗ2": [
+  {
+   "name": "taskhw2.py",
+   "code": "n = int(input('Введи N: '))\n\nwhile n > 0:\n    print(n, end=' ')   # end=' ' — друкуємо в один рядок через пробіл\n    n -= 1              # зменшуємо на 1 (зворотній відлік)\n\nprint('Старт!')         # виводимо після циклу",
+   "input": true
+  }
+ ]
+};
+const THEORY_IDS = ["cb-intro", "cb-while0", "cb-while1", "cb-break3", "cb-break4", "cb-cmp", "cb-cont5"];
+
+let pyodideReadyPromise = null;
+function setStatus(state, text){
+  const el = document.getElementById('pyoStatus');
+  const t = document.getElementById('pyoStatusText');
+  el.classList.remove('ready','loading');
+  if(state) el.classList.add(state);
+  t.textContent = text;
+}
+function getPyodide(){
+  if(!pyodideReadyPromise){
+    setStatus('loading', 'Python-середовище: завантаження…');
+    pyodideReadyPromise = loadPyodide().then(async (pyodide) => {
+      pyodide.globals.set("_js_prompt", (msg) => {
+        const v = window.prompt(msg && msg.length ? msg : "Введіть значення:");
+        return v === null ? "" : v;
+      });
+      await pyodide.runPythonAsync(`
+import builtins
+def input(prompt=""):
+    val = _js_prompt(prompt)
+    print(str(prompt) + str(val))
+    return val
+builtins.input = input
+`);
+      setStatus('ready', 'Python-середовище: готове');
+      return pyodide;
+    }).catch((e) => {
+      setStatus('loading', 'Не вдалося завантажити Python-середовище');
+      throw e;
+    });
+  }
+  return pyodideReadyPromise;
+}
+function escapeHtml(str){
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+async function runSandbox(blockId, fileIndex, btn){
+  const output = document.getElementById(blockId + '-output-' + fileIndex);
+  const textarea = document.getElementById(blockId + '-code-' + fileIndex);
+  const code = textarea.value;
+  output.classList.add('visible');
+  output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>завантаження Python…';
+  btn.disabled = true;
+  try{
+    const pyodide = await getPyodide();
+    let text = '';
+    const dec = new TextDecoder();
+    const wr = { write: (b) => { text += dec.decode(b, {stream:true}); return b.length; } };
+    pyodide.setStdout(wr);
+    pyodide.setStderr(wr);
+    const globalsDict = pyodide.globals.get('dict')();
+    try{
+      await pyodide.runPythonAsync("import sys\n_cnt = [0]\ndef _tr(frame, event, arg):\n    _cnt[0] += 1\n    if _cnt[0] > 400000:\n        sys.settrace(None)\n        raise RuntimeError('Програма працює надто довго — схоже на нескінченний цикл. Перевір, чи змінюється лічильник у циклі!')\n    return _tr\nsys.settrace(_tr)\n");
+      await pyodide.runPythonAsync(code, { globals: globalsDict });
+    } catch(err){
+      text += (text && !text.endsWith('\n') ? '\n' : '') + String(err);
+    } finally {
+      try{ pyodide.runPython('import sys; sys.settrace(None); sys.stdout.flush(); sys.stderr.flush()'); }catch(_e){}
+      globalsDict.destroy();
+      pyodide.setStdout({});
+      pyodide.setStderr({});
+    }
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>' + (text.trim() ? escapeHtml(text.replace(/\n+$/, '')) : '(немає виводу)');
+  } catch(e){
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>Помилка запуску: ' + escapeHtml(String(e));
+  } finally {
+    btn.disabled = false;
+  }
+}
+function renderCodeBlock(blockId, files){
+  const container = document.getElementById(blockId);
+  if(!container || container.dataset.rendered) return;
+  container.dataset.rendered = "1";
+  const hasInput = files.some(f => f.input);
+  let tabsHtml = '';
+  if(files.length > 1){
+    tabsHtml = '<div class="cb-tabs">' + files.map((f,i) =>
+      `<div class="cb-tab${i===0?' active':''}" data-idx="${i}">${f.name}</div>`
+    ).join('') + '</div>';
+  } else {
+    tabsHtml = `<div class="cb-tabs"><div class="cb-label">${files[0].name}</div></div>`;
+  }
+  let editorsHtml = files.map((f,i) =>
+    `<textarea class="cb-editor" id="${blockId}-code-${i}" style="display:${i===0?'block':'none'}" spellcheck="false">${escapeHtml(f.code)}</textarea>`
+  ).join('');
+  let outputsHtml = files.map((f,i) => `<div class="cb-output" id="${blockId}-output-${i}"></div>`).join('');
+  container.innerHTML = tabsHtml + editorsHtml +
+    `<div class="cb-toolbar">
+      <button class="cb-run" id="${blockId}-run">▶ Запустити</button>
+      ${hasInput ? '<span class="cb-hint">💡 код запитує дані — браузер покаже віконце для введення</span>' : ''}
+    </div>` + outputsHtml;
+
+  let activeIdx = 0;
+  if(files.length > 1){
+    container.querySelectorAll('.cb-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const idx = parseInt(tab.dataset.idx, 10);
+        container.querySelectorAll('.cb-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        files.forEach((f,i) => {
+          document.getElementById(`${blockId}-code-${i}`).style.display = (i===idx) ? 'block' : 'none';
+          document.getElementById(`${blockId}-output-${i}`).classList.remove('visible');
+        });
+        activeIdx = idx;
+      });
+    });
+  }
+  document.getElementById(blockId + '-run').addEventListener('click', function(){
+    runSandbox(blockId, activeIdx, this);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-toggle]').forEach(header => {
+    header.addEventListener('click', () => {
+      const phase = header.closest('.phase');
+      const body = phase.querySelector('.phase-body');
+      if(phase.classList.contains('open')){
+        body.style.maxHeight = body.scrollHeight + 'px';
+        requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
+        phase.classList.remove('open');
+      } else {
+        phase.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+        setTimeout(() => { if(phase.classList.contains('open')) body.style.maxHeight = 'none'; }, 360);
+      }
+    });
+  });
+  THEORY_IDS.forEach(id => renderCodeBlock(id, CODE_BLOCKS[id]));
+  document.querySelectorAll('.reveal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.reveal);
+      const isOpen = target.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.innerHTML = '<span class="chev">▸</span> ' + (isOpen ? btn.dataset.labelOpen : btn.dataset.labelClosed);
+      if(isOpen){
+        const cb = target.querySelector('.code-block');
+        if(cb && CODE_BLOCKS[cb.id]) renderCodeBlock(cb.id, CODE_BLOCKS[cb.id]);
+        const ph = btn.closest('.phase-body');
+        if(ph) ph.style.maxHeight = 'none';
+      }
+    });
+  });
+  const firstPhase = document.querySelector('.phase');
+  if(firstPhase){
+    firstPhase.classList.add('open');
+    firstPhase.querySelector('.phase-body').style.maxHeight = 'none';
+  }
+});
+</script>
+</body>
+</html>
