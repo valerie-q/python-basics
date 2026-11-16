@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python · Цикли — Урок 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F5; --panel:#FFFFFF; --ink:#17151A; --ink-soft:#5B584F; --ink-faint:#918D82;
+    --red:#C81E1E; --red-deep:#8C1410; --red-wash:#FBEAE9; --rule:#E6E2D8; --code-bg:#F4F2EC;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'IBM Plex Sans', -apple-system, sans-serif;
+    --display:'Manrope', var(--sans);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.6; font-size:16px; -webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--red); color:#fff;}
+
+  header.hero{padding:56px 24px 32px; max-width:880px; margin:0 auto; border-bottom:1px solid var(--rule);}
+  .eyebrow{font-family:var(--mono); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--red); font-weight:700; display:flex; align-items:center; gap:8px;}
+  .eyebrow::before{content:"›_"; color:var(--red);}
+  h1.title{font-family:var(--display); font-weight:800; font-size:clamp(1.8rem,4vw,2.6rem); margin:10px 0 6px; letter-spacing:-0.01em;}
+  .subtitle{color:var(--ink-soft); font-size:1.02rem; max-width:60ch;}
+  .pyostatus{margin-top:18px; display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:.8rem; color:var(--ink-soft); border:1px solid var(--rule); background:var(--panel); padding:6px 12px; border-radius:999px;}
+  .pyostatus .dot{width:8px; height:8px; border-radius:50%; background:var(--ink-faint); transition:background .3s;}
+  .pyostatus.ready .dot{background:#2E8B57;}
+  .pyostatus.loading .dot{background:var(--red); animation:blink 1s infinite;}
+  @keyframes blink{50%{opacity:.25;}}
+
+  nav.daynav{position:sticky; top:0; z-index:20; background:rgba(250,249,245,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--rule); padding:10px 24px;}
+  nav.daynav .wrap{max-width:880px; margin:0 auto; display:flex; gap:8px; flex-wrap:wrap;}
+  nav.daynav a{font-family:var(--mono); font-size:.78rem; text-decoration:none; color:var(--ink-soft); border:1px solid var(--rule); padding:5px 12px; border-radius:999px; background:var(--panel); transition:.15s;}
+  nav.daynav a:hover{border-color:var(--red); color:var(--red-deep);}
+
+  main{max-width:880px; margin:0 auto; padding:8px 24px 100px;}
+
+  .phase{background:var(--panel); border:1px solid var(--rule); border-radius:14px; margin:18px 0; overflow:hidden;}
+  .phase-header{display:flex; align-items:center; gap:14px; padding:16px 20px; cursor:pointer; user-select:none;}
+  .phase-header .phase-num{font-family:var(--mono); color:var(--red); font-weight:700; font-size:.85rem; flex:0 0 auto;}
+  .phase-header h3{font-family:var(--display); font-weight:700; font-size:1.08rem; margin:0; flex:1;}
+  .phase-header .chev{font-family:var(--mono); color:var(--ink-faint); transition:transform .25s; font-size:.9rem;}
+  .phase.open .phase-header .chev{transform:rotate(90deg); color:var(--red);}
+  .phase-body{max-height:0; overflow:hidden; transition:max-height .35s ease; padding:0 22px;}
+  .phase.open .phase-body{padding:0 22px 22px;}
+  .phase-body > *:first-child{margin-top:0;}
+
+  h4.sub{font-family:var(--display); font-weight:700; font-size:1rem; margin:22px 0 8px; color:var(--ink);}
+  p{margin:10px 0;}
+  ul, ol{padding-left:1.3em;}
+  li{margin:5px 0;}
+  code.inline, .inline-code{font-family:var(--mono); background:var(--code-bg); padding:1px 6px; border-radius:5px; font-size:.9em;}
+  strong{color:var(--ink);}
+  pre.static{margin:10px 0; padding:14px 18px; background:var(--code-bg); border:1px solid var(--rule); border-radius:10px; font-family:var(--mono); font-size:.85rem; white-space:pre; overflow-x:auto;}
+
+  blockquote.callout{border-left:3px solid var(--red); background:var(--red-wash); margin:14px 0; padding:12px 16px; border-radius:0 10px 10px 0; font-size:.95rem;}
+  blockquote.callout.warn{border-left-color:var(--ink-faint); background:var(--code-bg);}
+  .callout ul{margin:6px 0 0;}
+
+  table.reftable{width:100%; border-collapse:collapse; margin:16px 0; font-size:.92rem;}
+  table.reftable th{background:var(--red); color:#fff; text-align:left; padding:9px 12px; font-family:var(--display); font-weight:700; font-size:.85rem;}
+  table.reftable td{padding:8px 12px; border-bottom:1px solid var(--rule);}
+  table.reftable td:first-child{font-family:var(--mono); white-space:nowrap; color:var(--red-deep);}
+  table.reftable tr:nth-child(even){background:var(--code-bg);}
+
+  .code-block{margin:16px 0; border:1px solid var(--rule); border-radius:12px; overflow:hidden; background:var(--panel);}
+  .cb-tabs{display:flex; background:var(--code-bg); border-bottom:1px solid var(--rule); overflow-x:auto;}
+  .cb-tab{font-family:var(--mono); font-size:.8rem; padding:9px 16px; cursor:pointer; white-space:nowrap; color:var(--ink-soft); border-right:1px solid var(--rule); background:transparent; border-top:2px solid transparent;}
+  .cb-tab.active{background:var(--panel); color:var(--ink); border-top:2px solid var(--red); font-weight:600;}
+  .cb-label{font-family:var(--mono); font-size:.75rem; color:var(--ink-faint); padding:9px 14px; border-right:1px solid var(--rule);}
+  .cb-editor{width:100%; border:none; resize:vertical; background:var(--code-bg); color:var(--ink); font-family:var(--mono); font-size:.87rem; line-height:1.55; padding:16px 18px; min-height:60px; display:block; tab-size:4;}
+  .cb-editor:focus{outline:none; background:#F8F6F0;}
+  .cb-toolbar{display:flex; align-items:center; gap:12px; padding:10px 16px; border-top:1px solid var(--rule);}
+  .cb-run{font-family:var(--mono); font-size:.82rem; font-weight:700; color:#fff; background:var(--red); border:none; border-radius:8px; padding:8px 18px; cursor:pointer; display:flex; align-items:center; gap:7px; transition:.15s;}
+  .cb-run:hover{background:var(--red-deep);}
+  .cb-run:disabled{background:var(--ink-faint); cursor:wait;}
+  .cb-hint{font-family:var(--mono); font-size:.74rem; color:var(--ink-faint);}
+  .cb-output{display:none; border-top:1px dashed var(--rule); padding:14px 18px; background:#FFFFFF; font-family:var(--mono); font-size:.85rem; white-space:pre-wrap; word-break:break-word;}
+  .cb-output.visible{display:block;}
+  .cb-output .tag{color:var(--red); font-weight:700; margin-right:4px;}
+
+  .task-card{border-left:4px solid var(--red); background:var(--panel); border-radius:0 12px 12px 0; padding:16px 20px; margin:16px 0; border-top:1px solid var(--rule); border-right:1px solid var(--rule); border-bottom:1px solid var(--rule);}
+  .task-card .task-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .task-badge{font-family:var(--mono); font-weight:700; font-size:.78rem; color:#fff; background:var(--red); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .task-title{font-family:var(--display); font-weight:700; font-size:1rem;}
+  .task-stars{font-size:.78rem; color:var(--red); margin-left:auto; font-family:var(--mono);}
+  .task-body{color:var(--ink); font-size:.96rem;}
+
+  .reveal-btn{margin-top:12px; font-family:var(--mono); font-size:.8rem; color:var(--red-deep); background:var(--red-wash); border:1px solid #EFC9C7; border-radius:8px; padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .reveal-btn:hover{background:#F6DAD8;}
+  .reveal-btn.open .chev{transform:rotate(90deg);}
+  .reveal-btn .chev{transition:transform .2s; display:inline-block;}
+  .reveal-content{display:none; margin-top:10px;}
+  .reveal-content.open{display:block;}
+  .reveal-tip{font-size:.85rem; color:var(--ink-soft); font-style:italic; margin:8px 0 0;}
+
+  footer{max-width:880px; margin:60px auto 40px; padding:0 24px; color:var(--ink-faint); font-size:.85rem; font-family:var(--mono); border-top:1px solid var(--rule); padding-top:20px;}
+
+  @media (max-width:600px){ header.hero{padding:40px 16px 24px;} main{padding:8px 16px 80px;} .cb-editor{font-size:.8rem;} }
+  .btn-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
+  .btn-row .reveal-btn{margin-top:0;}
+  .task-body ul,.task-body ol{margin:6px 0;}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">python · цикли · урок 2</div>
+  <h1 class="title">while/else, for, range</h1>
+  <p class="subtitle">Гілка else після циклу, цикл for з лічильником і функція range() у трьох варіантах — плюс 10 завдань і домашнє із розв'язаннями.</p>
+  <div class="pyostatus" id="pyoStatus"><span class="dot"></span><span id="pyoStatusText">Python-середовище: очікує запуску</span></div>
+</header>
+<nav class="daynav"><div class="wrap"><a href="#theory">Теорія</a><a href="#practice">Практика</a><a href="#homework">Домашнє завдання</a></div></nav>
+<main>
+<div id="theory"></div>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">01</span><h3>while/else — гілка після циклу</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<p>while може мати блок <code class="inline">else</code> — як і if. Але else у циклі працює інакше:</p>
+<blockquote class="callout"><strong>Правило while/else:</strong><br>else виконується, якщо цикл завершився <strong>природно</strong> (умова стала False).<br><strong>else НЕ виконується, якщо цикл зупинили через break.</strong></blockquote>
+<h4 class="sub">Приклад — файл 6_while_else.py</h4>
+<div class="code-block" id="cb-we6"></div>
+<blockquote class="callout">💡 <code class="inline">while x:</code> — те саме, що <code class="inline">while x != 0:</code> (truth value з уроку 2 по if)</blockquote>
+<h4 class="sub">Порівняй — з break і без (файл 7_while_else_break.py)</h4>
+<p>Перша вкладка: якщо ввести <code class="inline">stop</code> — else пропускається. Друга вкладка: break немає, тому else виконується завжди.</p>
+<div class="code-block" id="cb-we7"></div>
+<blockquote class="callout"><strong>💡 Коли корисний while/else?</strong><br>Перевірка паролю — якщо всі спроби вичерпано (break не спрацював) → виводимо «заблоковано».<br>Пошук елемента — якщо знайшли → break. Якщо пройшли всі й не знайшли → else повідомляє про це.</blockquote>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">02</span><h3>Цикл for — синтаксис</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<p><strong>for</strong> — цикл із лічильником. Він повторює дії конкретну кількість разів. На відміну від while, не потрібно вручну змінювати лічильник — Python робить це сам.</p>
+<div class="code-block" id="cb-wf"></div>
+<h4 class="sub">Синтаксис</h4>
+<pre class="static">for змінна in range(...):
+    # тіло циклу
+    оператори</pre>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">03</span><h3>Функція range() — три варіанти</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<p><code class="inline">range()</code> генерує послідовність цілих чисел. Початкове значення входить у діапазон, кінцеве — <strong>НЕ входить</strong>.</p>
+<table class="reftable"><tr><th>Синтаксис</th><th>Повний запис</th><th>Що генерує</th></tr><tr><td>range(n)</td><td>range(0, n, 1)</td><td>0, 1, 2, …, n-1</td></tr><tr><td>range(a, b)</td><td>range(a, b, 1)</td><td>a, a+1, …, b-1</td></tr><tr><td>range(a, b, k)</td><td>—</td><td>a, a+k, a+2k, … (&lt; b)</td></tr><tr><td>range(b, a, -1)</td><td>зворотній</td><td>b, b-1, …, a+1</td></tr></table>
+<h4 class="sub">range(n) — від 0 до n-1 (файл 8_for.py)</h4>
+<div class="code-block" id="cb-for8"></div>
+<blockquote class="callout">💡 <code class="inline">range(10)</code> — 10 чисел, але від 0 до 9, а не від 1 до 10</blockquote>
+<h4 class="sub">range(a, b) — від a до b-1 (файл 9_for.py)</h4>
+<div class="code-block" id="cb-for9"></div>
+<blockquote class="callout">💡 <code class="inline">range(1, 11)</code> — від 1 до 10. Кінцеве значення завжди на 1 більше, ніж останнє число</blockquote>
+<h4 class="sub">range(a, b, крок) — з кроком (файл 10_for.py)</h4>
+<div class="code-block" id="cb-for10"></div>
+<blockquote class="callout">💡 Від'ємний крок (-1) — зворотній відлік. <code class="inline">range(10, 0, -1)</code> починає з 10, зупиняється перед 0</blockquote>
+<h4 class="sub">Перевірка «in range» (файл 16_range.py)</h4>
+<div class="code-block" id="cb-r16"></div>
+<blockquote class="callout">💡 <code class="inline">age in range(18, 66)</code> — елегантніша заміна <code class="inline">age &gt;= 18 and age &lt;= 65</code></blockquote>
+<h4 class="sub">Якщо змінна не потрібна — використовуй _</h4>
+<div class="code-block" id="cb-under"></div>
+<blockquote class="callout">💡 <code class="inline">_</code> (підкреслення) — угода серед програмістів: «ця змінна не використовується»</blockquote>
+<blockquote class="callout warn"><strong>⚠️ Типові помилки з range:</strong><ul><li><code class="inline">range(1, 10)</code> — виведе 1..9, не 10! Щоб включити 10: <code class="inline">range(1, 11)</code></li><li><code class="inline">range(10, 1)</code> — порожній діапазон! Для зворотного: <code class="inline">range(10, 0, -1)</code></li><li><code class="inline">range(0)</code> або <code class="inline">range(5, 5)</code> — порожній діапазон, цикл не виконається</li></ul></blockquote>
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">04</span><h3>Практика</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<div id="practice"></div>
+<h4 class="sub">⭐ Рівень 1 — while/else і перші for</h4>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">12</span><span class="task-title">Пароль з while/else</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Задай пароль у коді. Дай 3 спроби ввести правильний.<br>Якщо вгадав до закінчення спроб → <code class="inline">break</code> → «Вхід успішний».<br>Якщо всі спроби невдалі → <code class="inline">else</code> → «Доступ заблоковано».</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-12" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-12"><div class="code-block" id="cb-12"></div><p class="reveal-tip">💡 <code class="inline">else</code> після <code class="inline">while</code> — виконується тільки якщо break не спрацював (всі спроби вичерпані)</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">13</span><span class="task-title">Лічильник for</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Виведи числа від 1 до 10 за допомогою <code class="inline">for</code> + <code class="inline">range</code>.<br>Потім виведи числа від 10 до 1 у зворотному порядку.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-13" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-13"><div class="code-block" id="cb-13"></div><p class="reveal-tip">💡 <code class="inline">range(1, 11)</code> включає 10. <code class="inline">range(10, 0, -1)</code> починає з 10, кінчає на 1 (0 не входить)</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">14</span><span class="task-title">Сума парних</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Порахуй суму всіх парних чисел від 2 до 20 включно.<br>Використай <code class="inline">range</code> з кроком 2.<br>Відповідь: 110</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-14" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-14"><div class="code-block" id="cb-14"></div><p class="reveal-tip">💡 <code class="inline">range(2, 21, 2)</code> — елегантніше, але обидва варіанти правильні</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">15</span><span class="task-title">Таблиця множення (for)</span><span class="task-stars">⭐</span></div>
+ <div class="task-body">Запитай число N. Виведи таблицю множення на N від 1 до 10.<br>Використай <code class="inline">for</code> + <code class="inline">range</code>.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-15" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-15"><div class="code-block" id="cb-15"></div><p class="reveal-tip">💡 f-рядок автоматично підставляє значення змінних. × — символ множення (Alt+0215)</p></div>
+</div>
+<h4 class="sub">⭐⭐ Рівень 2 — range і комбінації</h4>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">16</span><span class="task-title">Факторіал</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Запитай число N. Обчисли N! (факторіал).<br>N! = 1 × 2 × 3 × … × N<br>Наприклад: 5! = 120</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-16" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-16"><div class="code-block" id="cb-16"></div><p class="reveal-tip">💡 <code class="inline">factorial *= i</code> — скорочений запис <code class="inline">factorial = factorial * i</code>. Починаємо з 1 (не з 0!)</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">17</span><span class="task-title">Числа кратні 7</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Виведи всі числа від 1 до 100, що діляться на 7.<br>Підрахуй і виведи, скільки таких чисел.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-17" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-17"><div class="code-block" id="cb-17"></div><p class="reveal-tip">💡 <code class="inline">range(7, 101, 7)</code> — одразу генерує кратні 7. Елегантніше, але перший варіант зрозуміліший</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">18</span><span class="task-title">Сума цифр числа</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Запитай ціле число. Порахуй суму його цифр.<br>Наприклад: 1234 → 1+2+3+4 = 10</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-18" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-18"><div class="code-block" id="cb-18"></div><p class="reveal-tip">💡 <code class="inline">for digit in number</code> — цикл for по рядку! Кожна ітерація дає один символ. Вивчимо глибше пізніше</p></div>
+</div>
+<h4 class="sub">⭐⭐⭐ Рівень 3 — Складніші завдання</h4>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">19</span><span class="task-title">Зірочкова лінійка</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Запитай ширину W і висоту H. Намалюй прямокутник із зірочок.<br>Наприклад W=5, H=3:<pre class="static">*****
+*****
+*****</pre></div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="hn-19" data-label-open="Сховати підказку" data-label-closed="💡 Підказка"><span class="chev">▸</span> 💡 Підказка</button> <button class="reveal-btn" data-reveal="rv-19" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="hn-19"><blockquote class="callout"><code class="inline">for</code> з <code class="inline">range</code> для рядків, <code class="inline">print('*' * W)</code> або вкладений <code class="inline">for</code>.</blockquote></div>
+ <div class="reveal-content" id="rv-19"><div class="code-block" id="cb-19"></div><p class="reveal-tip">💡 <code class="inline">'*' * w</code> — множення рядка: <code class="inline">'*' * 5 = '*****'</code>. Дуже зручно!</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">20</span><span class="task-title">Прості числа</span><span class="task-stars">⭐⭐⭐</span></div>
+ <div class="task-body">Виведи всі прості числа від 2 до 50.<br>Просте число — ділиться тільки на 1 і на себе.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="hn-20" data-label-open="Сховати підказку" data-label-closed="💡 Підказка"><span class="chev">▸</span> 💡 Підказка</button> <button class="reveal-btn" data-reveal="rv-20" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="hn-20"><blockquote class="callout">Для кожного числа n перевір, чи ділиться воно на будь-яке i від 2 до n-1.</blockquote></div>
+ <div class="reveal-content" id="rv-20"><div class="code-block" id="cb-20"></div><p class="reveal-tip">💡 <code class="inline">is_prime</code> — прапорець (True/False). Якщо знайшли дільник — скидаємо в False і виходимо через <code class="inline">break</code></p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">21</span><span class="task-title">Числова піраміда</span><span class="task-stars">⭐⭐⭐</span></div>
+ <div class="task-body">Виведи трикутник із чисел висотою N (запитай N):<pre class="static">1
+1 2
+1 2 3
+...
+1 2 3 ... N</pre></div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="hn-21" data-label-open="Сховати підказку" data-label-closed="💡 Підказка"><span class="chev">▸</span> 💡 Підказка</button> <button class="reveal-btn" data-reveal="rv-21" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="hn-21"><blockquote class="callout">Зовнішній <code class="inline">for</code> — рядки, внутрішній <code class="inline">for</code> — числа в рядку.</blockquote></div>
+ <div class="reveal-content" id="rv-21"><div class="code-block" id="cb-21"></div><p class="reveal-tip">💡 Вкладені цикли — зовнішній for по рядках, внутрішній — по числах у рядку. Детально на Уроці 3!</p></div>
+</div>
+
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">05</span><h3>🧭 Домашнє завдання</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<div id="homework"></div><div class="task-card">
+ <div class="task-head"><span class="task-badge">ДЗ1</span><span class="task-title">Степінь числа</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Запитай основу (a) і показник (n). Обчисли a^n без використання <code class="inline">**</code>.<br>Тобто: 2^5 = 2×2×2×2×2 = 32. Використай <code class="inline">for</code>.</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-ДЗ1" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-ДЗ1"><div class="code-block" id="cb-ДЗ1"></div><p class="reveal-tip">💡 <code class="inline">for _ in range(n)</code> — повторюємо n разів, але сам лічильник не використовуємо</p></div>
+</div>
+<div class="task-card">
+ <div class="task-head"><span class="task-badge">ДЗ2</span><span class="task-title">Шукаємо у діапазоні</span><span class="task-stars">⭐⭐</span></div>
+ <div class="task-body">Запитай число N. Знайди найбільший дільник числа N (крім самого N).<br>Якщо N просте — виведи «Число просте».<br>Використай <code class="inline">while/else</code> або <code class="inline">for/else</code> (for/else — на наступному уроці!).</div>
+ <div class="btn-row"><button class="reveal-btn" data-reveal="rv-ДЗ2" data-label-open="Сховати розв'язання" data-label-closed="Розв'язання"><span class="chev">▸</span> Розв'язання</button></div>
+ <div class="reveal-content" id="rv-ДЗ2"><div class="code-block" id="cb-ДЗ2"></div><p class="reveal-tip">💡 Шукаємо від n-1 вниз — як тільки знайшли перший дільник, це і є найбільший. while/else ідеально підходить!</p></div>
+</div>
+
+ </div>
+</section>
+<section class="phase" data-phase>
+ <div class="phase-header" data-toggle><span class="phase-num">06</span><h3>📋 Що вивчили</h3><span class="chev">▸</span></div>
+ <div class="phase-body">
+<ul><li>while/else — else спрацьовує, якщо цикл завершився БЕЗ break</li><li><code class="inline">for змінна in range(...):</code> — цикл з автоматичним лічильником</li><li><code class="inline">range(n)</code> → 0..n-1, <code class="inline">range(a,b)</code> → a..b-1, <code class="inline">range(a,b,k)</code> → з кроком</li><li>Зворотній відлік: <code class="inline">range(n, 0, -1)</code></li><li><code class="inline">n in range(a, b)</code> — перевірка, чи входить число в діапазон</li><li><code class="inline">_</code> — змінна, якщо лічильник не потрібен</li></ul>
+ </div>
+</section>
+</main>
+<footer>Python · Цикли — Урок 2 · сендбокси виконуються через Pyodide прямо в браузері</footer>
+<script src="https://cdn.jsdelivr.net/pyodide/v314.0.2/full/pyodide.js"></script>
+<script>
+const CODE_BLOCKS = {
+ "cb-we6": [
+  {
+   "name": "6_while_else.py",
+   "code": "x = 5\n\nwhile x:  # поки x не дорівнює нулю\n    print(x)\n    x -= 1\nelse:\n    print('Цикл виконаний\\nКінцеве значення x:', x)  # \"\\n\" - знак перенесення рядка",
+   "input": false
+  }
+ ],
+ "cb-we7": [
+  {
+   "name": "7_while_else_break.py",
+   "code": "x = 3\n\nwhile x:  # цикл буде повторено три рази, якщо користувач не завершить його раніше\n    x -= 1\n    response = input('Введіть stop, щоб зупинити цикл (інакше що завгодно): ')\n\n    if response == 'stop':\n        break\nelse:\n    # ця гілка буде виконана тільки якщо цикл не був перерваний\n    print('Цикл завершився сам')\n\nprint('Кінець програми')",
+   "input": true
+  },
+  {
+   "name": "без_break.py",
+   "code": "x = 3\nwhile x:\n    x -= 1\n    print(x)\nelse:\n    print('завершився сам')\n# else завжди виконається\n# бо break немає",
+   "input": false
+  }
+ ],
+ "cb-wf": [
+  {
+   "name": "while_лічильник.py",
+   "code": "i = 0\nwhile i < 5:\n    print(i)\n    i += 1   # треба не забути!",
+   "input": false
+  },
+  {
+   "name": "for_лічильник.py",
+   "code": "for i in range(5):\n    print(i)\n# i змінюється сам: 0,1,2,3,4\n# забути не можна 😊",
+   "input": false
+  }
+ ],
+ "cb-for8": [
+  {
+   "name": "8_for.py",
+   "code": "# i набуває значення в діапазоні [0, 10)\nfor i in range(10):\n    print('i =', i)",
+   "input": false
+  }
+ ],
+ "cb-for9": [
+  {
+   "name": "9_for.py",
+   "code": "# i набуває значення в діапазоні [5, 10)\nfor i in range(5, 10):\n    print('i =', i)",
+   "input": false
+  },
+  {
+   "name": "9_for (розширено)",
+   "code": "for i in range(5, 10):   # i = 5, 6, 7, 8, 9\n    print('i =', i)\n\n# Якщо треба від 1 до 10 включно:\nfor i in range(1, 11):   # i = 1, 2, ..., 10\n    print(i)",
+   "input": false
+  }
+ ],
+ "cb-for10": [
+  {
+   "name": "10_for.py",
+   "code": "# i набуває значення в діапазоні [10, 101) з кроком 5\nfor i in range(10, 101, 5):\n    print('i =', i)",
+   "input": false
+  },
+  {
+   "name": "10_for (розширено)",
+   "code": "# Крок 5 — тільки кожне п'яте число:\nfor i in range(10, 101, 5):  # 10, 15, 20, ..., 100\n    print(i)\n\n# Тільки парні числа від 2 до 20:\nfor i in range(2, 21, 2):    # 2, 4, 6, ..., 20\n    print(i)\n\n# Зворотній відлік:\nfor i in range(10, 0, -1):   # 10, 9, 8, ..., 1\n    print(i)\nprint('Старт!')",
+   "input": false
+  }
+ ],
+ "cb-r16": [
+  {
+   "name": "16_range.py",
+   "code": "my_range1 = range(3)\nmy_range2 = range(5)\n\ntest1 = 3 in my_range1\ntest2 = 3 in my_range2\nprint(test1)\nprint(test2)",
+   "input": false
+  },
+  {
+   "name": "16_range (з уроку)",
+   "code": "my_range = range(5)    # 0, 1, 2, 3, 4\n\nprint(3 in my_range)   # True  — 3 є в діапазоні\nprint(5 in my_range)   # False — 5 не входить!\n\n# Корисно для перевірки діапазону:\nage = int(input('Вік: '))\nif age in range(18, 66):\n    print('Працездатний вік')",
+   "input": true
+  }
+ ],
+ "cb-under": [
+  {
+   "name": "підкреслення.py",
+   "code": "# Потрібно виконати щось 5 разів, але i не використовуємо:\nfor _ in range(5):\n    print('Привіт!')\n\n# _ — умовна назва для 'непотрібна змінна'",
+   "input": false
+  }
+ ],
+ "cb-12": [
+  {
+   "name": "task12.py",
+   "code": "password = 'python123'\nattempts = 3\n\nwhile attempts > 0:\n    entered = input('Введи пароль: ')\n    if entered == password:\n        print('Вхід успішний!')\n        break\n    attempts -= 1\n    if attempts > 0:\n        print(f'Невірно. Залишилось спроб: {attempts}')\nelse:\n    print('Доступ заблоковано!')",
+   "input": true
+  }
+ ],
+ "cb-13": [
+  {
+   "name": "task13.py",
+   "code": "# Від 1 до 10:\nfor i in range(1, 11):\n    print(i)\n\n# Від 10 до 1 (зворотній):\nfor i in range(10, 0, -1):\n    print(i)",
+   "input": false
+  }
+ ],
+ "cb-14": [
+  {
+   "name": "task14.py",
+   "code": "total = 0\n\nfor i in range(2, 21, 2):   # 2, 4, 6, ..., 20\n    total += i\n\nprint('Сума парних від 2 до 20:', total)  # 110\n\n# Або без кроку — з умовою:\ntotal = 0\nfor i in range(1, 21):\n    if i % 2 == 0:\n        total += i\nprint(total)",
+   "input": false
+  }
+ ],
+ "cb-15": [
+  {
+   "name": "task15.py",
+   "code": "n = int(input('Введи число: '))\n\nfor i in range(1, 11):\n    print(f'{n} × {i} = {n * i}')",
+   "input": true
+  }
+ ],
+ "cb-16": [
+  {
+   "name": "task16.py",
+   "code": "n = int(input('Введи число: '))\nfactorial = 1\n\nfor i in range(1, n + 1):   # від 1 до n включно\n    factorial *= i           # множимо накопичувач на i\n\nprint(f'{n}! = {factorial}')\n\n# Наприклад: n=5 → 1×2×3×4×5 = 120",
+   "input": true
+  }
+ ],
+ "cb-17": [
+  {
+   "name": "task17.py",
+   "code": "count = 0\n\nfor i in range(1, 101):\n    if i % 7 == 0:\n        print(i, end=' ')    # виводимо в один рядок\n        count += 1\n\nprint()                      # переносимо рядок після чисел\nprint(f'Кількість: {count}')\n\n# Або через range з кроком 7:\nfor i in range(7, 101, 7):\n    print(i, end=' ')",
+   "input": false
+  }
+ ],
+ "cb-18": [
+  {
+   "name": "task18.py",
+   "code": "number = input('Введи число: ')   # беремо як рядок (не int!)\ntotal = 0\n\nfor digit in number:              # кожен символ рядка — одна цифра\n    if digit != '-':              # ігноруємо мінус для від'ємних\n        total += int(digit)       # перетворюємо символ в число\n\nprint(f'Сума цифр: {total}')\n\n# Наприклад: '1234' → '1','2','3','4' → 1+2+3+4 = 10",
+   "input": true
+  }
+ ],
+ "cb-19": [
+  {
+   "name": "task19.py",
+   "code": "w = int(input('Ширина: '))\nh = int(input('Висота: '))\n\n# Варіант 1 — через множення рядка:\nfor i in range(h):\n    print('*' * w)\n\n# Варіант 2 — вкладені цикли (детально на наступному уроці):\nfor i in range(h):           # зовнішній цикл — рядки\n    for j in range(w):       # внутрішній — зірочки в рядку\n        print('*', end='')\n    print()                  # переніс рядка після кожного ряду",
+   "input": true
+  }
+ ],
+ "cb-20": [
+  {
+   "name": "task20.py",
+   "code": "for n in range(2, 51):\n    is_prime = True              # припускаємо що просте\n\n    for i in range(2, n):        # перевіряємо всі дільники від 2 до n-1\n        if n % i == 0:           # знайшли дільник\n            is_prime = False\n            break                # далі перевіряти не треба\n\n    if is_prime:\n        print(n, end=' ')\n\n# Виведе: 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47",
+   "input": false
+  }
+ ],
+ "cb-21": [
+  {
+   "name": "task21.py",
+   "code": "n = int(input('Висота піраміди: '))\n\n# Варіант 1 — через рядкові операції:\nfor i in range(1, n + 1):\n    row = ''\n    for j in range(1, i + 1):\n        row += str(j) + ' '\n    print(row)\n\n# Варіант 2 — через join (елегантніший):\nfor i in range(1, n + 1):\n    print(' '.join(str(j) for j in range(1, i + 1)))\n\n# Для n=4:\n# 1\n# 1 2\n# 1 2 3\n# 1 2 3 4",
+   "input": true
+  }
+ ],
+ "cb-ДЗ1": [
+  {
+   "name": "taskhw1.py",
+   "code": "a = int(input('Основа (a): '))\nn = int(input('Показник (n): '))\nresult = 1\n\nfor _ in range(n):    # множимо n разів (лічильник не потрібен)\n    result *= a\n\nprint(f'{a}^{n} = {result}')",
+   "input": true
+  }
+ ],
+ "cb-ДЗ2": [
+  {
+   "name": "taskhw2.py",
+   "code": "n = int(input('Введи число: '))\n\n# Шукаємо від n-1 вниз — перший дільник і є найбільшим:\ni = n - 1\nwhile i > 1:\n    if n % i == 0:\n        print(f'Найбільший дільник {n}: {i}')\n        break\n    i -= 1\nelse:\n    print(f'{n} — просте число')\n\n# while/else: якщо пройшли всі i і break не спрацював → число просте",
+   "input": true
+  }
+ ]
+};
+const THEORY_IDS = ["cb-we6", "cb-we7", "cb-wf", "cb-for8", "cb-for9", "cb-for10", "cb-r16", "cb-under"];
+
+let pyodideReadyPromise = null;
+function setStatus(state, text){
+  const el = document.getElementById('pyoStatus');
+  const t = document.getElementById('pyoStatusText');
+  el.classList.remove('ready','loading');
+  if(state) el.classList.add(state);
+  t.textContent = text;
+}
+function getPyodide(){
+  if(!pyodideReadyPromise){
+    setStatus('loading', 'Python-середовище: завантаження…');
+    pyodideReadyPromise = loadPyodide().then(async (pyodide) => {
+      pyodide.globals.set("_js_prompt", (msg) => {
+        const v = window.prompt(msg && msg.length ? msg : "Введіть значення:");
+        return v === null ? "" : v;
+      });
+      await pyodide.runPythonAsync(`
+import builtins
+def input(prompt=""):
+    val = _js_prompt(prompt)
+    print(str(prompt) + str(val))
+    return val
+builtins.input = input
+`);
+      setStatus('ready', 'Python-середовище: готове');
+      return pyodide;
+    }).catch((e) => {
+      setStatus('loading', 'Не вдалося завантажити Python-середовище');
+      throw e;
+    });
+  }
+  return pyodideReadyPromise;
+}
+function escapeHtml(str){
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+async function runSandbox(blockId, fileIndex, btn){
+  const output = document.getElementById(blockId + '-output-' + fileIndex);
+  const textarea = document.getElementById(blockId + '-code-' + fileIndex);
+  const code = textarea.value;
+  output.classList.add('visible');
+  output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>завантаження Python…';
+  btn.disabled = true;
+  try{
+    const pyodide = await getPyodide();
+    let text = '';
+    const dec = new TextDecoder();
+    const wr = { write: (b) => { text += dec.decode(b, {stream:true}); return b.length; } };
+    pyodide.setStdout(wr);
+    pyodide.setStderr(wr);
+    const globalsDict = pyodide.globals.get('dict')();
+    try{
+      await pyodide.runPythonAsync("import sys\n_cnt = [0]\ndef _tr(frame, event, arg):\n    _cnt[0] += 1\n    if _cnt[0] > 400000:\n        sys.settrace(None)\n        raise RuntimeError('Програма працює надто довго — схоже на нескінченний цикл. Перевір, чи змінюється лічильник у циклі!')\n    return _tr\nsys.settrace(_tr)\n");
+      await pyodide.runPythonAsync(code, { globals: globalsDict });
+    } catch(err){
+      text += (text && !text.endsWith('\n') ? '\n' : '') + String(err);
+    } finally {
+      try{ pyodide.runPython('import sys; sys.settrace(None); sys.stdout.flush(); sys.stderr.flush()'); }catch(_e){}
+      globalsDict.destroy();
+      pyodide.setStdout({});
+      pyodide.setStderr({});
+    }
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>' + (text.trim() ? escapeHtml(text.replace(/\n+$/, '')) : '(немає виводу)');
+  } catch(e){
+    output.innerHTML = '<span class="tag">&gt;&gt;&gt;</span>Помилка запуску: ' + escapeHtml(String(e));
+  } finally {
+    btn.disabled = false;
+  }
+}
+function renderCodeBlock(blockId, files){
+  const container = document.getElementById(blockId);
+  if(!container || container.dataset.rendered) return;
+  container.dataset.rendered = "1";
+  const hasInput = files.some(f => f.input);
+  let tabsHtml = '';
+  if(files.length > 1){
+    tabsHtml = '<div class="cb-tabs">' + files.map((f,i) =>
+      `<div class="cb-tab${i===0?' active':''}" data-idx="${i}">${f.name}</div>`
+    ).join('') + '</div>';
+  } else {
+    tabsHtml = `<div class="cb-tabs"><div class="cb-label">${files[0].name}</div></div>`;
+  }
+  let editorsHtml = files.map((f,i) =>
+    `<textarea class="cb-editor" id="${blockId}-code-${i}" style="display:${i===0?'block':'none'}" spellcheck="false">${escapeHtml(f.code)}</textarea>`
+  ).join('');
+  let outputsHtml = files.map((f,i) => `<div class="cb-output" id="${blockId}-output-${i}"></div>`).join('');
+  container.innerHTML = tabsHtml + editorsHtml +
+    `<div class="cb-toolbar">
+      <button class="cb-run" id="${blockId}-run">▶ Запустити</button>
+      ${hasInput ? '<span class="cb-hint">💡 код запитує дані — браузер покаже віконце для введення</span>' : ''}
+    </div>` + outputsHtml;
+
+  let activeIdx = 0;
+  if(files.length > 1){
+    container.querySelectorAll('.cb-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const idx = parseInt(tab.dataset.idx, 10);
+        container.querySelectorAll('.cb-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        files.forEach((f,i) => {
+          document.getElementById(`${blockId}-code-${i}`).style.display = (i===idx) ? 'block' : 'none';
+          document.getElementById(`${blockId}-output-${i}`).classList.remove('visible');
+        });
+        activeIdx = idx;
+      });
+    });
+  }
+  document.getElementById(blockId + '-run').addEventListener('click', function(){
+    runSandbox(blockId, activeIdx, this);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-toggle]').forEach(header => {
+    header.addEventListener('click', () => {
+      const phase = header.closest('.phase');
+      const body = phase.querySelector('.phase-body');
+      if(phase.classList.contains('open')){
+        body.style.maxHeight = body.scrollHeight + 'px';
+        requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
+        phase.classList.remove('open');
+      } else {
+        phase.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+        setTimeout(() => { if(phase.classList.contains('open')) body.style.maxHeight = 'none'; }, 360);
+      }
+    });
+  });
+  THEORY_IDS.forEach(id => renderCodeBlock(id, CODE_BLOCKS[id]));
+  document.querySelectorAll('.reveal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.reveal);
+      const isOpen = target.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.innerHTML = '<span class="chev">▸</span> ' + (isOpen ? btn.dataset.labelOpen : btn.dataset.labelClosed);
+      if(isOpen){
+        const cb = target.querySelector('.code-block');
+        if(cb && CODE_BLOCKS[cb.id]) renderCodeBlock(cb.id, CODE_BLOCKS[cb.id]);
+        const ph = btn.closest('.phase-body');
+        if(ph) ph.style.maxHeight = 'none';
+      }
+    });
+  });
+  const firstPhase = document.querySelector('.phase');
+  if(firstPhase){
+    firstPhase.classList.add('open');
+    firstPhase.querySelector('.phase-body').style.maxHeight = 'none';
+  }
+});
+</script>
+</body>
+</html>
